@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+
 class CartItem extends Component {
     constructor(props) {
         super(props);
@@ -10,9 +11,9 @@ class CartItem extends Component {
     }
 
     handleUpdateCartQty(lineItemId, quantity) {
-        if (quantity < 1) {
-            return this.handleRemoveFromCart();
-        }
+        // if (quantity < 1) {
+        //     return this.handleRemoveFromCart();
+        // }
         this.props.onUpdateCartQty(lineItemId, quantity)
     }
 

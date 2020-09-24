@@ -129,7 +129,6 @@ class App extends Component {
         <ProductsList 
           products={products}
           onAddToCart={this.handleAddToCart}
-
         />
 
         <Cart 

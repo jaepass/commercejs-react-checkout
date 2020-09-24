@@ -9,12 +9,12 @@ class ProductsList extends Component {
 
         return (
             <>
-                <div className="products">
+                <div className="products" id="products">
                     {products.map((product) => (
                         <ProductItem
                             key={product.id}
                             product={product}
-                            onAddToCart={this.props.handleAddToCart}
+                            {...this.props}
                         />
                     ))}
                 </div>

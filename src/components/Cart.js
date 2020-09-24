@@ -8,16 +8,22 @@ class Cart extends Component {
         super(props);
 
         this.handleUpdateCartQty = this.handleUpdateCartQty.bind(this);
-        this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
         this.handleEmptyCart = this.handleEmptyCart.bind(this);
     }
 
+    /**
+     * Updates line_items in cart
+     * https://commercejs.com/docs/sdk/cart/#update-cart
+     *
+     * @param {string} lineItemId ID of the cart line item being updated
+     * @param {number} quantity New line item quantity to update
+     */
     handleUpdateCartQty(lineItemId, newQuantity) {
-        this.props.onUpdateCartQty(lineItemId, newQuantity)
-    }
-
-    handleRemoveFromCart(lineItemId) {
-        this.props.onRemoveFromCart(lineItemId);
+        commerce.cart.update(lineItemId, { newQuantity }).then((resp) => {
+        this.setState({ cart: resp.cart })
+        }).catch((error) => {
+        console.log('There was an error updating the cart items', error);
+        });
     }
 
     handleEmptyCart() {
@@ -37,9 +43,9 @@ class Cart extends Component {
                             <CartItem
                                 item={lineItem}
                                 key={lineItem.id}
-                                onUpdateCartQty={this.handleUpdateCartQty}
-                                onRemoveFromCart={this.handleRemoveFromCart}
+                                {...this.props}
                                 className="cart__inner"
+                                onUpdateCartQty={this.handleUpdateCartQty}
                             />
                         ))}
                         <div className="cart__total">
