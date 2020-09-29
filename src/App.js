@@ -69,11 +69,11 @@ class App extends Component {
    * https://commercejs.com/docs/sdk/cart
    */
   fetchCart() {
-      commerce.cart.retrieve().then((cart) => {
-        this.setState({ cart: cart });
-      }).catch((error) => {
-        console.error('There was an error fetching the cart', error);
-      });
+    commerce.cart.retrieve().then((cart) => {
+      this.setState({ cart: cart });
+    }).catch((error) => {
+      console.error('There was an error fetching the cart', error);
+    });
   }
 
   /**

@@ -10,8 +10,8 @@ class CartItem extends Component {
         this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
     }
 
-    handleUpdateCartQty(lineItemId, quantity) {
-        this.props.onUpdateCartQty(lineItemId, quantity)
+    handleUpdateCartQty(lineItemId, newQuantity) {
+        this.props.onUpdateCartQty(lineItemId, newQuantity);
     }
 
     handleRemoveFromCart(lineItemId) {
@@ -43,6 +43,7 @@ export default CartItem;
 
 CartItem.propTypes = {
     item: PropTypes.object,
+    handleUpdateCartQty: PropTypes.func,
     onUpdateCartQty: () => {},
     onRemoveFromCart: () => {}
  };
