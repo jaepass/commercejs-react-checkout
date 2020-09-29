@@ -13,13 +13,15 @@ class App extends Component {
     this.state = {
         merchant: {},
         products: [],
-        cart: {}
+        cart: {},
+        isCartVisible: false,
     }
 
     this.handleAddToCart = this.handleAddToCart.bind(this);
     this.handleUpdateCartQty = this.handleUpdateCartQty.bind(this);
     this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
     this.handleEmptyCart = this.handleEmptyCart.bind(this);
+    this.toggleCart = this.toggleCart.bind(this);
   }
 
   componentDidMount() {
@@ -28,6 +30,20 @@ class App extends Component {
     this.fetchCart();
   }
 
+  /**
+   * Show hide cart in nav
+   */
+  toggleCart() {
+    const { isCartVisible } = this.state;
+    this.setState({ 
+      isCartVisible: !isCartVisible,
+    });
+  };
+
+  /**
+   * Fetch merchant details
+   * https://commercejs.com/docs/sdk/full-sdk-reference#merchants
+   */
   fetchMerchantDetails() {
     commerce.merchants.about().then((merchant) => {
       this.setState({ merchant: merchant });
@@ -83,11 +99,11 @@ class App extends Component {
    * @param {number} quantity New line item quantity to update
    */
   handleUpdateCartQty(lineItemId, newQuantity) {
-      commerce.cart.update(lineItemId, { newQuantity }).then((resp) => {
-        this.setState({ cart: resp.cart })
-      }).catch((error) => {
-        console.log('There was an error updating the cart items', error);
-      });
+    commerce.cart.update(lineItemId, { newQuantity }).then((resp) => {
+      this.setState({ cart: resp.cart })
+    }).catch((error) => {
+      console.log('There was an error updating the cart items', error);
+    });
   }
 
   /**
@@ -118,24 +134,43 @@ class App extends Component {
       });
   }
 
+  renderCartNav() {
+    const { isCartVisible } = this.state;
+
+    return (
+      <div className="nav">
+        <div className="nav__cart" onClick={this.toggleCart}>
+          {!isCartVisible ? <button>Cart</button> : <button>Close</button>}
+        </div>
+      </div>
+    )
+  }
+
   render() {
-    const { products, merchant, cart } = this.state;
+    const { 
+      products,
+      merchant,
+      cart,
+      isCartVisible
+    } = this.state;
 
     return (
       <div className="app">
+        { this.renderCartNav() }
+        {isCartVisible &&
+          <Cart
+            cart={cart}
+            onUpdateCartQty={this.handleUpdateCartQty}
+            onRemoveFromCart={this.handleRemoveFromCart}
+            onEmptyCart={this.handleEmptyCart}
+          />
+        }  
         <Hero
           merchant={merchant}
         />
         <ProductsList 
           products={products}
           onAddToCart={this.handleAddToCart}
-        />
-
-        <Cart 
-          cart={cart}
-          onUpdateCartQty={this.handleUpdateCartQty}
-          onRemoveFromCart={this.handleRemoveFromCart}
-          onEmptyCart={this.handleEmptyCart}
         />
       </div>
     );
