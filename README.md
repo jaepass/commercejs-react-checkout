@@ -6,7 +6,7 @@ Add cart functionality to your React application using Commerce.js.
 
 The goal of this guide is to demonstrate how to add cart functionality to your products page so multiple products can be added to a cart, increase or decrease the item quantities, and clear items from the cart.
 
-Below is what we will be accomplishing with this guide:
+Below is what you will accomplish with this guide:
 
 1. Retrieve and/or create a cart in our application
 2. Add products to cart
@@ -117,7 +117,7 @@ The `cart.retrieve()` method will run, resolve, and the returned data will be st
 
 ### 2. Add to cart
 
-In Commerce.js, one of the main cart methods is [add to cart](https://commercejs.com/docs/sdk/cart/#add-to-cart).
+With Commerce.js, one of the main cart methods is [add to cart](https://commercejs.com/docs/sdk/cart/#add-to-cart).
 This method calls the `POST v1/carts/{cart_id}` Cart API endpoint. With your cart object response, you can start to interact with and add the necessary event handlers to handle your cart functionalities. Similar to how you can pass props as custom attributes, you can do that with native and custom events via callbacks. Because you will need to display a button to handle your add to cart functionality, go back to the `ProductItem.js` component to add that in the product card.
 Create a button tag and pass a function to the React native `onClick` attribute which will be the function handler you want to handle your event, the `handleAddToCart` event handler in this case.
 
@@ -132,7 +132,7 @@ Create a button tag and pass a function to the React native `onClick` attribute 
 </button>
 ```
 
-In React, data being passed down from a parent component to a child component is called props. In order to listen for any events in a child component, you can use callback functions. After attaching a click event in your **Quick add** button to call the `handleAddToCart` event handler, you will now need to create the handler function.
+In React, data being passed down from a parent component to a child component is called props. In order to listen for any events in a child component, use callback functions. After attaching a click event in your **Quick add** button to call the `handleAddToCart` event handler, now create the handler function.
 
 ```jsx
 // ProductItem.js
@@ -152,7 +152,7 @@ constructor(props) {
 }
 ```
 
-Let's now head back to `App.js` to pass in your callback `onAddToCart` in the `ProductsListing` component instance and attach a `handleAddToCart()` method where you will be making the "add to cart" request to the Chec API.
+Head back to `App.js` to pass in your callback `onAddToCart` in the `ProductsListing` component instance and attach a `handleAddToCart()` method and make the "add to cart" request to the Chec API.
 
 ```jsx
 // App.js
@@ -246,13 +246,13 @@ The above helper handle makes a call to the `commerce.cart.add` method. When the
 }
 ```
 
-In the JSON response, you can note that the added product is now given associated `line_items` details such as its `line_item_id`, and `line_total`. With this data, you can now create your cart component and render cart details like a list of added items.
+In the JSON response, you can note that the added product is now given associated `line_items` details such as its `line_item_id`, and `line_total`. With this data, create your cart component and render cart details like a list of added items.
 
 ### 3. Create a cart component
 
 Start by creating a cart component in the components folder. Here you will want to follow the same pattern to try to encapsulate and break down smaller components to be consumable by parent components. This way you continue to keep your application DRY as well and keep your logic separated.
 
-In your components folder, first create a `Cart.js` as a class component which is what will render the main cart container.
+In your components folder, create a `Cart.js` as a class component, this will render the main cart container.
 
 ```jsx
 import React, { Component } from 'react';
@@ -309,22 +309,22 @@ class Cart extends Component {
 export default Cart;
 ```
 
-In `Cart.js`, first import in a `CartItem` component you will create next. You've split up our rendering methods
+In `Cart.js`, import in a `CartItem` component you will create next. You've now split up your rendering methods
 into a couple of parts:
 
 * Render a message when the cart is empty
-* Render the contents of the cart when it it not empty
+* Render the contents of the cart when it is not empty
 * Render a wrapper that calls the above two methods
 
-To render an empty cart message we'll first check that the cart is empty and return early if it isn't. You can use the
- `cart.total_unique_items` property to determine this. You can return a simple paragraph tag with a message in it.
+To render an empty cart message, first check that the cart is empty and return early if it isn't. Use the
+ `cart.total_unique_items` property to determine this. Return a simple paragraph tag with a message in it.
 
-When rendering the cart you'll do the opposite check from `renderEmptyCart()` and check that the cart _does_ have items
+When rendering the cart you'll do the opposite check from `renderEmptyCart()` checking that the cart _does_ have items
 in it, returning early if not. Next, you will want to render out the individual line items that exists in the cart
 object when items are added to cart. You're rendering a `CartItem` component for each line item, providing the line
 item object as the `item` prop, and assigning it a unique `key` with the line item's `id` property.
 
-Lastly, you'll want to render some cart subtotals. You can use the `cart.subtotal.formatted_with_symbol` property
+Lastly, render some cart subtotals. You can use the `cart.subtotal.formatted_with_symbol` property
 to get the cart's subtotal with the currency symbol (e.g. `$19.95`). This property will be updated whenever your cart
 object changes in the state, so your cart updates in real time!
 
@@ -390,7 +390,7 @@ handleUpdateCartQty(lineItemId, newQuantity) {
 }
 ```
 
-Above, you created a handler function `handleUpdateCartQty()` to call a `onUpdateCartQty()` callback property. The parameters passed in will be available to the parent component, our `App.js` in this case, which will handle and execute the updating of line items in your cart.
+You've now created a handler function `handleUpdateCartQty()` to call a `onUpdateCartQty()` callback property. The parameters passed in will be available to the parent component, your `App.js` in this case, which will handle and execute the updating of line items in your cart.
 
 Now in your CartItem component, hook up your "update cart quantity" functionality with a click handler. Between the item quantity element, attach your custom `handleUpdateCartQty` method to button click events. In the first button, implement a click handler to decrease the line item quantity by 1 and in the second button to increase it by 1.
 
@@ -525,7 +525,7 @@ Go ahead and click an update button for one of the line items. Upon a successful
 
 ### 5. Remove items from cart
 
-Now that you have the ability to update the quantity of individual line items in your cart, you might also want the to be able to remove that line item from your cart. The Commerce.js `commerce.cart.remove()` [method](https://commercejs.com/docs/sdk/cart#remove-from-cart) helps with this.
+Now that you have the ability to update the quantity of individual line items in your cart, it's a good idea to let customers remove line items from your cart entierly. The Commerce.js `commerce.cart.remove()` [method](https://commercejs.com/docs/sdk/cart#remove-from-cart) helps with this.
 
 Go back to your `CartItem.js` component to add the "remove item from cart" logic. Underneath `handleUpdateCartQty()`, add a helper method and call it `handleRemoveFromCart()`.
 
