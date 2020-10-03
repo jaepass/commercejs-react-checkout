@@ -10,10 +10,11 @@
     position: fixed;
 
     &__heading {
-        padding: 0.75rem 1rem;
+        padding: 0.95rem 1rem;
         font-weight: bold;
-        border: 2px solid $text-primary;
+        border-bottom: 2px solid $text-primary;
         color: $text-primary;
+        font-size: 1.25rem;
     }
 
     &__inner {
@@ -22,11 +23,12 @@
 
     &__total {
         display: flex;
-        padding: 1rem 1.25rem;
+        padding: 1rem 1.25rem 0;
         border-top: 2px solid $text-primary;
+        justify-content: space-between;
     }
 
-    &__total-item {
+    &__total-title {
         color: $text-primary;
         font-weight: bold;
     }
@@ -73,6 +75,7 @@
 
     .cart-item {
         display: flex;
+        padding: 1.25rem;
     
         &__image {
             width: 4rem;
@@ -83,14 +86,31 @@
         }
 
         &__details-name {
-            font-size: 0.875rem;
+            font-size: 0.98rem;
             color: $text-primary;
             font-weight: bold;
+            margin-bottom: 0.25rem;
         }
 
         &__details-qty {
             display: flex;
             margin: 0 auto;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+
+            button {
+                border: none;
+                background: none;
+                height: 4px;
+            }
+
+            p {
+                margin-bottom: 0;
+            }
+        }
+
+        &__details-price {
+            font-size: 0.875rem;
         }
     
         &__remove {

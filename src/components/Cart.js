@@ -46,6 +46,10 @@ class Cart extends Component {
               <p className="cart__total-title">Subtotal:</p>
               <p className="cart__total-price">{cart.subtotal.formatted_with_symbol}</p>
             </div>
+            <div className="cart__footer">
+              <button className="cart__btn-empty" onClick={this.handleEmptyCart}>Empty cart</button>
+              <button className="cart__btn-checkout">Checkout</button> 
+            </div>
           </>
         );
     }
