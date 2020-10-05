@@ -1,17 +1,24 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import CartItem from './CartItem';
+import { Link } from "react-router-dom";
 
 class Cart extends Component {
     constructor(props) {
         super(props);
 
         this.handleEmptyCart = this.handleEmptyCart.bind(this);
+        //this.handleRouteToCheckout = this.handleRouteToCheckout.bind(this);
     }
 
     handleEmptyCart() {
         this.props.onEmptyCart();
     }
+
+    // handleRouteToCheckout() {
+    //   const history = this.props;
+    //   history.push(`/checkout/${this.props.cart.id}`);
+    // }
 
     renderEmptyCart() {
         const { cart } = this.props;
@@ -48,7 +55,13 @@ class Cart extends Component {
             </div>
             <div className="cart__footer">
               <button className="cart__btn-empty" onClick={this.handleEmptyCart}>Empty cart</button>
-              <button className="cart__btn-checkout">Checkout</button> 
+              <Link
+                className="cart__btn-checkout"
+                to="/checkout"
+                //onClick={this.handleRouteToCheckout}
+              >
+                Checkout
+              </Link> 
             </div>
           </>
         );
@@ -72,5 +85,6 @@ Cart.propTypes = {
     onUpdateCartQty: () => {},
     onRemoveFromCart: () => {},
     onEmptyCart: () => {},
-    handleUpdateCartQty: PropTypes.func
+    handleUpdateCartQty: PropTypes.func,
+    history: PropTypes.object
  };

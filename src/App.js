@@ -6,8 +6,15 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faShoppingBag, faTimes } from '@fortawesome/free-solid-svg-icons'
 
 import Hero from './components/Hero';
-import ProductsList from "./components/ProductsList";
+import ProductsList from './components/ProductsList';
 import Cart from './components/Cart';
+import Checkout from './pages/Checkout';
+
+import {
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 library.add(faShoppingBag, faTimes)
 
@@ -20,6 +27,8 @@ class App extends Component {
       products: [],
       cart: {},
       isCartVisible: false,
+      checkoutToken: null,
+      order: null,
     }
 
     this.handleAddToCart = this.handleAddToCart.bind(this);
@@ -139,6 +148,25 @@ class App extends Component {
     });
   }
 
+  /**
+   * Captures the checkout
+   * https://commercejs.com/docs/sdk/checkout#capture-order
+   *
+   * @param {string} checkoutTokenId The ID of the checkout token
+   * @param {object} newOrder The new order object data
+   */
+  handleConfirmOrder(checkoutTokenId, newOrder) {
+    commerce.checkout.capture(checkoutTokenId, newOrder).then((order) => {
+      // this.refreshCart();
+      this.order = order;
+      // this.$router.push('/confirmation', { order });
+      this.isNavVisible = false;
+      window.sessionStorage.setItem('order_receipt', JSON.stringify(order));
+    }).catch((error) => {
+        console.log('There was an error confirming your order', error);
+    });
+  }
+
   renderCartNav() {
     const { cart, isCartVisible } = this.state;
 
@@ -170,21 +198,44 @@ class App extends Component {
 
     return (
       <div className="app">
-        { this.renderCartNav() }
-        {isCartVisible &&
-          <Cart
-            cart={cart}
-            onUpdateCartQty={this.handleUpdateCartQty}
-            onRemoveFromCart={this.handleRemoveFromCart}
-            onEmptyCart={this.handleEmptyCart}
-          />
-        }  
-        <Hero
-          merchant={merchant}
+        <Route
+          path="/"
+          render={(props) => {
+            return (
+              <>
+               { this.renderCartNav() }
+                {isCartVisible &&
+                  <Cart
+                    {...this.props}
+                    cart={cart}
+                    onUpdateCartQty={this.handleUpdateCartQty}
+                    onRemoveFromCart={this.handleRemoveFromCart}
+                    onEmptyCart={this.handleEmptyCart}
+                  />
+                }  
+                <Hero
+                  merchant={merchant}
+                />
+                <ProductsList
+                  {...props}
+                  products={products}
+                  onAddToCart={this.handleAddToCart}
+                />
+              </>
+            );
+          }}
         />
-        <ProductsList 
-          products={products}
-          onAddToCart={this.handleAddToCart}
+        <Route
+          path="/checkout"
+          render={(props) => {
+            return (
+              <Checkout
+                {...props}
+                cart={cart}
+                onCaptureOrder={this.handleCaptureOrder}
+              />
+            )
+          }}
         />
       </div>
     );

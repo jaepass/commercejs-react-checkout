@@ -1,0 +1,121 @@
+.checkout {
+
+    &__wrapper {
+      display: flex;
+      justify-content: center;
+    }
+  
+    &__heading {
+      margin-top: 2.5rem;
+      margin-left: 3rem;
+      color: $text-grey;
+    }
+  
+      &__form {
+          background-color: white;
+          border: 2px solid $text-primary;
+          width: 50%;
+          padding: 1.5rem 2rem;
+          margin: 3rem;
+          margin-top: 1.5rem;
+      }
+  
+      &__subheading {
+        font-size: 1.125rem;
+        font-style: bold;
+        color: $text-primary;
+  
+        &:not(:first-child) {
+          padding-top: 1.25rem;
+        }
+      }
+  
+      &__label {
+          display: block;
+          font-size: 0.75rem;
+          font-style: bold;
+          color: $text-grey;
+          text-transform: uppercase;
+          padding-top: 0.75rem;
+      }
+  
+      &__input {
+        border: 1px solid $text-primary;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+      }
+  
+      &__select {
+        border: 1px solid $text-primary;
+        padding: 0.25rem 0.5rem;
+  
+        select > option {
+          font-size: 0.875rem;
+        }
+      }
+  
+      &__btn-confirm {
+         background-color: $text-primary;
+         border: 1px solid $text-primary;
+         padding-left: 1.25rem;
+         padding: 0.5rem 0.75rem;
+         font-size: 0.75rem;
+         text-transform: uppercase;
+         color: white;
+         font-style: bold;
+         margin-top: 1.5rem;
+  
+          &:hover {
+              background-color: lighten(#292B83, 10);
+          }
+  
+          &:disabled {
+            cursor: not-allowed;
+          }
+      }
+  
+      &__summary {
+        margin-top: 1.5rem;
+        border: 2px solid $text-primary;
+        width: 20%;
+        padding: 1.5rem 2rem;
+        height: max-content;
+  
+        h4 {
+          font-style: bold;
+          color: $text-primary;
+        }
+      }
+  
+      &__summary-details {
+        // @apply flex my-3;
+        display: flex;
+        margin: 0.75rem;
+      }
+  
+      &__summary-img {
+         width: 4rem;
+         height: 4rem;
+         border: 1px solid $text-primary;
+         margin-right: 0.75rem;
+         object-fit: cover;
+      }
+  
+      &__summary-name {
+        color: $text-primary;
+      }
+  
+      &__summary-value {
+        margin-left: auto;
+      }
+  
+      &__summary-price {
+        margin-right: auto;
+        justify-content: flex-end;
+
+  
+        span {
+          font-style: bold;
+        }
+      }
+  }
