@@ -4,14 +4,13 @@ import './styles/scss/styles.scss'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faShoppingBag, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { Switch, Route } from 'react-router-dom';
 
 import Hero from './components/Hero';
 import ProductsList from './components/ProductsList';
 import Cart from './components/Cart';
 import Checkout from './pages/Checkout';
 import Confirmation from './pages/Confirmation';
-
-import { Switch, Route } from "react-router-dom";
 
 library.add(faShoppingBag, faTimes)
 
@@ -24,7 +23,6 @@ class App extends Component {
       products: [],
       cart: {},
       isCartVisible: false,
-      checkoutToken: null,
       order: null,
     }
 
@@ -33,6 +31,8 @@ class App extends Component {
     this.handleRemoveFromCart = this.handleRemoveFromCart.bind(this);
     this.handleEmptyCart = this.handleEmptyCart.bind(this);
     this.toggleCart = this.toggleCart.bind(this);
+    this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
+    this.refreshCart = this.refreshCart.bind(this);
   }
 
   componentDidMount() {
@@ -152,15 +152,31 @@ class App extends Component {
    * @param {string} checkoutTokenId The ID of the checkout token
    * @param {object} newOrder The new order object data
    */
-  handleConfirmOrder(checkoutTokenId, newOrder) {
+  handleCaptureCheckout(checkoutTokenId, newOrder) {
     commerce.checkout.capture(checkoutTokenId, newOrder).then((order) => {
-      // this.refreshCart();
-      this.order = order;
+      this.setState({
+        order: order
+      });
+      this.refreshCart();
       this.history.push('/confirmation', { order });
       //this.isNavVisible = false;
       window.sessionStorage.setItem('order_receipt', JSON.stringify(order));
     }).catch((error) => {
         console.log('There was an error confirming your order', error);
+    });
+  }
+
+  /**
+   * Refreshes to a new cart
+   * https://commercejs.com/docs/sdk/cart#refresh-cart
+   */
+  refreshCart() {
+    commerce.cart.refresh().then((newCart) => {
+      this.setState({ 
+        cart: newCart
+       })
+    }).catch((error) => {
+      console.log('There was an error refreshing your cart', error);
     });
   }
 
@@ -205,16 +221,16 @@ class App extends Component {
                   <Hero
                     merchant={merchant}
                   />
-                   { this.renderCartNav() }
-                    {isCartVisible &&
-                      <Cart
-                        {...this.props}
-                        cart={cart}
-                        onUpdateCartQty={this.handleUpdateCartQty}
-                        onRemoveFromCart={this.handleRemoveFromCart}
-                        onEmptyCart={this.handleEmptyCart}
-                      />
-                    }  
+                  { this.renderCartNav() }
+                  {isCartVisible &&
+                    <Cart
+                      {...props}
+                      cart={cart}
+                      onUpdateCartQty={this.handleUpdateCartQty}
+                      onRemoveFromCart={this.handleRemoveFromCart}
+                      onEmptyCart={this.handleEmptyCart}
+                    />
+                  } 
                   <ProductsList
                     {...props}
                     products={products}
@@ -232,7 +248,7 @@ class App extends Component {
                 <Checkout
                   {...props}
                   cart={cart}
-                  onCaptureOrder={this.handleCaptureOrder}
+                  onCaptureCheckout={this.handleCaptureCheckout}
                 />
               )
             }}

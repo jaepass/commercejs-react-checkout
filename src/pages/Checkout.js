@@ -39,16 +39,25 @@ class Checkout extends Component {
         }
 
         this.handleChangeShippingCountry = this.handleChangeShippingCountry.bind(this);
-        this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
+        // this.handleChangeShippingSubdivision = this.handleChangeShippingSubdivision.bind(this);
+        // this.handleChangeShippingOption = this.handleChangeShippingOption.bind(this);
+        // this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
     }
 
     componentDidMount() {
-        this.generateCheckoutToken();
-        if(this.state.checkoutToken === null) {
-            return;
-        }
+        //this.generateCheckoutToken();
+        // if(this.state.checkoutToken === null) {
+        //     return;
+        // }
         this.fetchShippingCountries(this.state.checkoutToken.id);
         //this.handleChangeShippingCountry({target: {value: Object.keys(countries.countries)[0]}})
+    }
+
+    componentDidUpdate() {
+        const { cart } = this.props
+        if (cart.line_items.length) {
+            this.generateCheckoutToken();
+        }
     }
 
    /**
@@ -133,8 +142,43 @@ class Checkout extends Component {
         this.fetchShippingSubdivisions(currentValue);
     }
 
-    handleCaptureCheckout() {
+    handleChangeShippingOption(e) {
+        const currentValue = e.target.value;
+        this.fetchShippingSubdivisions(currentValue);
+    }
 
+    handleCaptureCheckout() {
+        const orderData = {
+            line_items: this.state.checkoutToken.live.line_items,
+            customer: {
+                firstname: this.state.form.customer.firstName,
+                lastname: this.state.form.customer.lastName,
+                email: this.state.form.customer.email
+            },
+            shipping: {
+                name: this.state.form.shipping.name,
+                street: this.state.form.shipping.street,
+                town_city: this.state.form.shipping.city,
+                county_state: this.state.form.shipping.stateProvince,
+                postal_zip_code: this.state.form.shipping.postalZipCode,
+                country: this.state.form.shipping.country,
+            },
+            fulfillment: {
+                shipping_method: this.state.form.fulfillment.shippingOption
+            },
+            payment: {
+                gateway: "test_gateway",
+                card: {
+                    number: this.state.form.payment.cardNum,
+                    expiry_month: this.state.form.payment.expMonth,
+                    expiry_year: this.state.form.payment.expYear,
+                    cvc: this.state.form.payment.ccv,
+                    postal_zip_code: this.state.form.payment.billingPostalZipCode
+                }
+            }
+        };
+        this.props.onCaptureCheckout(this.state.checkoutToken.id, orderData);
+        //this.props.history.push('/confirmation');
     }
 
     renderCheckoutForm() {
@@ -171,7 +215,7 @@ class Checkout extends Component {
                     <select 
                         value={this.state.form.shipping.country}
                         name="country"
-                        //onChange={this.handleChangeShippingCountry}
+                        onChange={this.handleChangeShippingCountry}
                         className="checkout__select"
                     >
                         <option value="" disabled>Country</option>
@@ -188,6 +232,7 @@ class Checkout extends Component {
                     <select 
                         value={this.state.form.shipping.stateProvince}
                         name="stateProvince"
+                        onChange={this.handleChangeShippingSubdivision}
                         className="checkout__select"
                     >
                         <option className="checkout__option" value="" disabled>State/province</option>
@@ -203,7 +248,12 @@ class Checkout extends Component {
                     </select>
 
                     <label className="checkout__label" htmlFor="shippingOption">Shipping method</label>
-                    <select value={this.state.form.fulfillment.shippingOption} name="shippingOption" className="checkout__select">
+                    <select
+                        value={this.state.form.fulfillment.shippingOption}
+                        name="shippingOption"
+                        onChange={this.handleChangeShippingOption}
+                        className="checkout__select"
+                    >
                         <option className="checkout__select-option" value="" disabled>Select a shipping method</option>
                         {
                             Object.keys(shippingOptions).map((method, index) => {
@@ -225,7 +275,7 @@ class Checkout extends Component {
                     <input className="checkout__input" type="text" name="expMonth" value={this.state.form.payment.expMonth} placeholder="Card expiry month" />
 
                     <label className="checkout__label" htmlFor="expYear">Expiry year</label>
-                    <input claclassNamess="checkout__input" type="text" name="expYear" value={this.state.form.payment.expYear} placeholder="Card expiry year" />
+                    <input className="checkout__input" type="text" name="expYear" value={this.state.form.payment.expYear} placeholder="Card expiry year" />
 
                     <label className="checkout__label" htmlFor="ccv">CCV</label>
                     <input className="checkout__input" type="text" name="ccv" value={this.state.form.payment.ccv} placeholder="CCV (3 digits)" />
@@ -235,30 +285,31 @@ class Checkout extends Component {
         );
     };
 
-    // renderCheckoutSummary() {
-    //     return (
-    //         <>
-    //             <div className="checkout__summary">
-    //                 <h4>Order summary</h4>
-    //                     {this.state.checkoutToken.line_items.map((lineItem) => (
-    //                         <>
-    //                             <div key={lineItem.id} className="checkout__summary-details">
-    //                                 <img className="checkout__summary-img" src={lineItem.media.source} />
-    //                                 <p className="checkout__summary-name">{lineItem.quantity} x {lineItem.name}</p>
-    //                                 <p className="checkout__summary-value">{lineItem.line_total.formatted_with_symbol}</p>
-    //                                 </div>
-    //                                 <div className="checkout__summary-total">
-    //                                 <p className="checkout__summary-price">
-    //                                     <span>Subtotal:</span>
-    //                                     {/* {liveObject.total_due.formatted_with_symbol} */}
-    //                                 </p>
-    //                             </div>
-    //                         </>
-    //                     ))}
-    //             </div>
-    //         </>
-    //     )
-    // }
+    renderCheckoutSummary() {
+        const { checkoutToken } = this.state;
+        return (
+            <>
+                <div className="checkout__summary">
+                    <h4>Order summary</h4>
+                        {checkoutToken.line_items.map((lineItem) => (
+                            <>
+                                <div key={lineItem.id} className="checkout__summary-details">
+                                    <img className="checkout__summary-img" src={lineItem.media.source} alt={lineItem.name}/>
+                                    <p className="checkout__summary-name">{lineItem.quantity} x {lineItem.name}</p>
+                                    <p className="checkout__summary-value">{lineItem.line_total.formatted_with_symbol}</p>
+                                    </div>
+                                    <div className="checkout__summary-total">
+                                    <p className="checkout__summary-price">
+                                        <span>Subtotal:</span>
+                                        {/* {liveObject.total_due.formatted_with_symbol} */}
+                                    </p>
+                                </div>
+                            </>
+                        ))}
+                </div>
+            </>
+        )
+    }
 
     render() {
         return (
@@ -278,5 +329,6 @@ class Checkout extends Component {
 export default Checkout;
 
 Checkout.propTypes = {
-    cart: PropTypes.object
+    cart: PropTypes.object,
+    onCaptureCheckout: () => {},
 };
