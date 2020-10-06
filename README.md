@@ -202,7 +202,7 @@ to a `<Link>` element.
 
 Now, if you click the link, you should be route to a blank page with the url ending in a `/checkout`.
 
-### 2. Create checkout page
+### 2. Generate token in the checkout component
 
 Earlier in step 1 we created the appropriate route components to navigate to a checkout page. You will now create that
 view page to render when the router points to the `/checkout` path. 
@@ -256,7 +256,7 @@ checkout.
 */
 generateCheckoutToken() {
   const { cart } = this.props;
-  if(cart.total_items > 0) {
+  if(cart.line_items.length) {
     commerce.checkout.generateToken(cart.id, { type: 'cart' })
       .then((token) => {
         this.setState({ checkoutToken: token });
@@ -267,10 +267,197 @@ generateCheckoutToken() {
 }
 ```
 
+The `commerce.checkout.generateToken()` takes in our cart ID and the identifier type `cart`. The type property is an
+optional parameter you can pass in as an identifier, in this case `cart` the type associated to `this.cart.id`. First check that `line_items` in `cart` exists with an `if` statement before inserting the `generateToken()` method. The returned full `token` object will be stored in the `checkoutToken` state you created above after a successful request.
+
+To call this function, include it in the `componentDidMount` lifecyle hook to generate a token when the component mounts.
+
+```jsx
+componentDidMount() {
+  this.generateCheckoutToken();
+}
+```
+
+When you click the checkout button from the cart page, you will be routed to `/checkout` and in which case the `generateCheckoutToken()` function will run. Upon a successful request to generate the checkout token, you should receive an abbreviated response like the below json
+data:
+
+```json
+{
+  "id": "chkt_J5aYJ8zBG7dM95",
+  "cart_id": "cart_ywMy2OE8zO7Dbw",
+  "created": 1600411250,
+  "expires": 1601016050,
+  "analytics": {
+    "google": {
+      "settings": {
+        "tracking_id": null,
+        "linked_domains": null
+      }
+    }
+  },
+  "line_items": [
+    {
+      "id": "item_7RyWOwmK5nEa2V",
+      "product_id": "prod_NqKE50BR4wdgBL",
+      "name": "Kettle",
+      "image": "https://cdn.chec.io/merchants/18462/images/676785cedc85f69ab27c42c307af5dec30120ab75f03a9889ab29|u9 1.png",
+      "sku": null,
+      "description": "<p>Black stove-top kettle</p>",
+      "quantity": 1,
+      "price": {
+        "raw": 45.5,
+        "formatted": "45.50",
+        "formatted_with_symbol": "$45.50",
+        "formatted_with_code": "45.50 USD"
+      },
+      "subtotal": {
+        "raw": 45.5,
+        "formatted": "45.50",
+        "formatted_with_symbol": "$45.50",
+        "formatted_with_code": "45.50 USD"
+      },
+      "variants": [],
+      "conditionals": {
+        "is_active": true,
+        "is_free": false,
+        "is_tax_exempt": false,
+        "is_pay_what_you_want": false,
+        "is_quantity_limited": false,
+        "is_sold_out": false,
+        "has_digital_delivery": false,
+        "has_physical_delivery": false,
+        "has_images": true,
+        "has_video": false,
+        "has_rich_embed": false,
+        "collects_fullname": false,
+        "collects_shipping_address": false,
+        "collects_billing_address": false,
+        "collects_extrafields": false
+      },
+    }
+  ],
+  "shipping_methods": [],
+  "live": {
+    "merchant_id": 18462,
+    "currency": {
+      "code": "USD",
+      "symbol": "$"
+    },
+    "line_items": [
+      {
+        "id": "item_7RyWOwmK5nEa2V",
+        "product_id": "prod_NqKE50BR4wdgBL",
+        "product_name": "Kettle",
+        "type": "standard",
+        "sku": null,
+        "quantity": 1,
+        "price": {
+          "raw": 45.5,
+          "formatted": "45.50",
+          "formatted_with_symbol": "$45.50",
+          "formatted_with_code": "45.50 USD"
+        },
+        "line_total": {
+          "raw": 45.5,
+          "formatted": "45.50",
+          "formatted_with_symbol": "$45.50",
+          "formatted_with_code": "45.50 USD"
+        },
+        "variants": [],
+        "tax": {
+          "is_taxable": false,
+          "taxable_amount": null,
+          "amount": null,
+          "breakdown": null
+        }
+      },
+      {
+        "id": "item_1ypbroE658n4ea",
+        "product_id": "prod_kpnNwAMNZwmXB3",
+        "product_name": "Book",
+        "type": "standard",
+        "sku": null,
+        "quantity": 1,
+        "price": {
+          "raw": 13.5,
+          "formatted": "13.50",
+          "formatted_with_symbol": "$13.50",
+          "formatted_with_code": "13.50 USD"
+        },
+        "line_total": {
+          "raw": 13.5,
+          "formatted": "13.50",
+          "formatted_with_symbol": "$13.50",
+          "formatted_with_code": "13.50 USD"
+        },
+        "variants": [],
+        "tax": {
+          "is_taxable": false,
+          "taxable_amount": null,
+          "amount": null,
+          "breakdown": null
+        }
+      }
+    ],
+    "subtotal": {
+      "raw": 59,
+      "formatted": "59.00",
+      "formatted_with_symbol": "$59.00",
+      "formatted_with_code": "59.00 USD"
+    },
+    "discount": [],
+    "shipping": {
+      "available_options": [],
+      "price": {
+        "raw": 0,
+        "formatted": "0.00",
+        "formatted_with_symbol": "$0.00",
+        "formatted_with_code": "0.00 USD"
+      }
+    },
+    "tax": {
+      "amount": {
+        "raw": 0,
+        "formatted": "0.00",
+        "formatted_with_symbol": "$0.00",
+        "formatted_with_code": "0.00 USD"
+      }
+    },
+    "total": {
+      "raw": 59,
+      "formatted": "59.00",
+      "formatted_with_symbol": "$59.00",
+      "formatted_with_code": "59.00 USD"
+    },
+    "total_with_tax": {
+      "raw": 59,
+      "formatted": "59.00",
+      "formatted_with_symbol": "$59.00",
+      "formatted_with_code": "59.00 USD"
+    },
+    "giftcard": [],
+    "total_due": {
+      "raw": 59,
+      "formatted": "59.00",
+      "formatted_with_symbol": "$59.00",
+      "formatted_with_code": "59.00 USD"
+    },
+    "pay_what_you_want": {
+      "enabled": false,
+      "minimum": null,
+      "customer_set_price": null
+    },
+    "future_charges": []
+  }
+}
+```
+
+### 3. Build out the checkout page
+
 There are four core properties that are required to process an order using Commerce.js - `customer`, `shipping`,
-`fulfillment`, and `payment`. Let's start to define the fields you need to capture in the form. The main property
+`fulfillment`, and `payment`. Let's get back to your constructor's state and start to define the fields you need to capture in the checkout form. The main property
 objects will all go under a `form` object. You will then bind these properties to each single field in the render
-function with the `value` attribute.
+function with the `value` attribute. Note the values filled out in the data, these are arbitray values that will prefill the checkout form when it mounts.
 
 ```jsx
 class Checkout extends Component {
@@ -304,28 +491,18 @@ class Checkout extends Component {
           billingPostalZipCode: '94107',
         },
       },
-      shippingCountries: {},
-      shippingSubdivisions: {},
-      shippingOptions: [],
     }
-  };
-
-  render() {
-    return (
-      <div></div>
-    );
   };
 };
 
 export default Checkout;
 ```
 
-And in the render function, as mentioned, bind the data to each of the `value` attributes in the input
-elements. The inputs will be pre-filled with the state data created above.
+Since this page will contain a lot of markup to render a various components for field inputs and in turn can get quite bloated, you will want to create a separate render function for the checkout form. This keeps your checkout component file readable and organized. As mentioned above, bind the data to each of the `value` attributes in the input
+elements in the form element below. The inputs will be pre-filled with the state data created above.
 
 ```jsx
 renderCheckoutForm() {
-  const { shippingCountries, shippingSubdivisions, shippingOptions } = this.state;
 
   return (
     <form className="checkout__form">
@@ -384,3 +561,24 @@ checkout helper functions will be touched on and these functions will:
    fulfillment data collection
 -  Get the live object and update it with any data changes from the form fields
 
+### 3. Checkout helpers
+
+Let's first add to the constructor's state and initialize the empty objects and arrays that you will need to store the responses from the [checkout
+helper](https://commercejs.com/docs/sdk/concepts#checkout-helpers) methods.
+
+```js
+data() {
+  return {
+    liveObject: {},
+    shippingOptions: [],
+    shippingSubdivisions: {},
+    countries: {},
+    loading: false,
+  }
+```
+
+We will go through each of the initialized data and the checkout helper method that pertains to it. First let's have a
+look at the `liveObject`. The [live object](https://commercejs.com/docs/sdk/concepts#the-live-object) is a living object
+which adjusts to show the live tax rates, prices, and totals for a checkout token. This object will be updated every
+time a checkout helper executes and the data can be used to reflect the changing UI i.e. when the shipping option is
+applied or when tax is calculated. Let's now first create a method that will fetch the live object:
