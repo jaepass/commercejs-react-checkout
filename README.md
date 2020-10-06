@@ -34,7 +34,8 @@ This project assumes you have some knowledge of the below concepts before starti
 
 ## Some things to note
 
-- The purpose of this guide is to focus on the Commerce.js checkout integration, using Vue.js to build out the application. We will therefore not be covering styling details
+- The purpose of this guide is to focus on the Commerce.js checkout integration, using Vue.js to build out the
+  application. We will therefore not be covering styling details
 - We will not be going over any Font Awesome usage
 - We will not be going over any UI details that do not pertain much to Commerce.js methods
 
@@ -43,7 +44,12 @@ This project assumes you have some knowledge of the below concepts before starti
 
 ### 1. Set up routing
 
-For fully functional SPAs (single page applications) to scale, you will need to add routing in order to navigate to various view pages such to a cart or checkout flow. For a Commerce.js application, this is where you have the full flexibility of creating fully custom checkout flow. Let's jump right back to where we left off from the previous cart guide and add [react-router-dom](https://reactrouter.com/web/guides), a routing library for React web application, to our project. You will only need to install `react-router-dom` and not `react-router`, which is for React Native. Install the routing library by running the below command.
+For fully functional SPAs (single page applications) to scale, you will need to add routing in order to navigate to
+various view pages such to a cart or checkout flow. For a Commerce.js application, this is where you have the full
+flexibility of creating fully custom checkout flow. Let's jump right back to where we left off from the previous cart
+guide and add [react-router-dom](https://reactrouter.com/web/guides), a routing library for React web application, to
+our project. You will only need to install `react-router-dom` and not `react-router`, which is for React Native. Install
+the routing library by running the below command.
 
 ```bash
 yarn add react-router-dom
@@ -51,7 +57,10 @@ yarn add react-router-dom
 npm i react-router-dom
 ```
 
-After installing, you'll need to make sure the router component is rendered at the root of your element hierarchy to have access to the routes you will be setting up. First, go into `src/index.js`, import the `[BrowserRouter](https://reactrouter.com/web/guides/primary-components)` component in and wrap the `<App>` element in the router component.
+After installing, you'll need to make sure the router component is rendered at the root of your element hierarchy to
+have access to the routes you will be setting up. First, go into `src/index.js`, import the
+`[BrowserRouter](https://reactrouter.com/web/guides/primary-components)` component in and wrap the `<App>` element in
+the router component.
 
 ```jsx
 import React from 'react';
@@ -66,7 +75,9 @@ ReactDOM.render(
 , document.getElementById("root"));
 ```
 
-Now that you've added routing to serve your whole application, you'll now need to add page components that you'll be creating in the next section to the [Route Matchers](https://reactrouter.com/web/guides/primary-components) components `<Route>` and `<Switch>` in `App.js`.
+Now that you've added routing to serve your whole application, you'll now need to add page components that you'll be
+creating in the next section to the [Route Matchers](https://reactrouter.com/web/guides/primary-components) components
+`<Route>` and `<Switch>` in `App.js`.
 
 First, import the Route Matchers components `Route` and `Switch` from `react-router-dom`.
 
@@ -109,7 +120,8 @@ Next, in your render function, wrap your `<Cart>` and `<Products>` components in
 
 Let's walk through the above code block - The `<Route>` includes the attributes:
 - `path`'s value points to the path you want to route to
-- `render` outputs the components included in the view page indicated at the `path` value. You can optionally pass `props` to the render attribute.
+- `render` outputs the components included in the view page indicated at the `path` value. You can optionally pass
+  `props` to the render attribute.
 - `exact` attribute ensures the `<Route path>` matches the entire URL.
 
 Now that you've set the initial route component, include a `<Checkout>` component which you will get to creating next.
@@ -163,11 +175,18 @@ return (
 );
 ```
 
-Note the `<Switch>` element, which was imported from the `react-router-dom` module earlier, wrapping around the `<Route>`s. When the `<Switch>`element renders, it will search through the child elements to render the one whose path matches the current URL. 
+Note the `<Switch>` element, which was imported from the `react-router-dom` module earlier, wrapping around the
+`<Route>`s. When the `<Switch>`element renders, it will search through the child elements to render the one whose path
+matches the current URL. 
 
-Secondly, a new `<Route>` element was added which returns a `<Checkout>` component with a path pointing to `/checkout`. Pass `{...props}` `cart={cart}` to ensure you have access to them in the checkout component. You will create this component in the upcoming section. This is all the routing setup you will need for now until the remaining view components are added later in the guide.
+Secondly, a new `<Route>` element was added which returns a `<Checkout>` component with a path pointing to `/checkout`.
+Pass `{...props}` `cart={cart}` to ensure you have access to them in the checkout component. You will create this
+component in the upcoming section. This is all the routing setup you will need for now until the remaining view
+components are added later in the guide.
 
-Lastly, the checkout page will need to be pushed into view from the cart checkout button created in the previous cart guide. Go into `Cart.js` to import the `Link` component in, a navigation component, and refactor the checkout `<button>` to a `<Link>` element.
+Lastly, the checkout page will need to be pushed into view from the cart checkout button created in the previous cart
+guide. Go into `Cart.js` to import the `Link` component in, a navigation component, and refactor the checkout `<button>`
+to a `<Link>` element.
 
 ```jsx
 <div className="cart__footer">
@@ -185,20 +204,25 @@ Now, if you click the link, you should be route to a blank page with the url end
 
 ### 2. Create checkout page
 
-Earlier in step 1 we created the appropriate route components to navigate to a checkout page. You will now
-create that view page to render when the router points to the `/checkout` path. 
+Earlier in step 1 we created the appropriate route components to navigate to a checkout page. You will now create that
+view page to render when the router points to the `/checkout` path. 
 
-First, let's create a new folder `src/pages` and a `Checkout.js` page component. This page component is going to get real hefty quite fast, but it will be broken it down in chunks throughout the rest of this guide.
+First, let's create a new folder `src/pages` and a `Checkout.js` page component. This page component is going to get
+real hefty quite fast, but it will be broken it down in chunks throughout the rest of this guide.
 
-The [Checkout resource](https://commercejs.com/docs/sdk/checkout) in Chec helps to handle one of the most
-complex moving parts of an eCommerce application. The Checkout endpoint comes with the core
-`commerce.checkout.generateToken()` and `commerce.checkout.capture()` methods along with [Checkout
+The [Checkout resource](https://commercejs.com/docs/sdk/checkout) in Chec helps to handle one of the most complex moving
+parts of an eCommerce application. The Checkout endpoint comes with the core `commerce.checkout.generateToken()` and
+`commerce.checkout.capture()` methods along with [Checkout
 helpers](https://commercejs.com/docs/sdk/concepts#checkout-helpers) - additional helper functions for a seamless
 purchasing flow which will be touched on more later.
 
-In the `Checkout.js` page component, let's start first by initializing all the data you will need in this component to build the checkout page and form. 
+In the `Checkout.js` page component, let's start first by initializing all the data you will need in this component to
+build the checkout page and form. 
 
-Commerce.js provides a powerful method [`commerce.checkout.generateToken()`](https://commercejs.com/docs/sdk/checkout#generate-token) to capture all the data needed from the cart and initiate the checkout process simply by providing a cart ID, a product ID, or a product's permalink as an argument. You'll use a cart ID since we've already built the cart.
+Commerce.js provides a powerful method
+[`commerce.checkout.generateToken()`](https://commercejs.com/docs/sdk/checkout#generate-token) to capture all the data
+needed from the cart and initiate the checkout process simply by providing a cart ID, a product ID, or a product's
+permalink as an argument. You'll use a cart ID since we've already built the cart.
 
 Let's create a class component then initialize a `checkoutToken` in the constructor's state.
 
@@ -222,7 +246,8 @@ class Checkout extends Component {
 export default Checkout;
 ```
 
-Next, create the helper function `generateCheckoutToken()` that will generate the checkout token needed to capture the checkout.
+Next, create the helper function `generateCheckoutToken()` that will generate the checkout token needed to capture the
+checkout.
 
 ```jsx
 /**
@@ -242,9 +267,10 @@ generateCheckoutToken() {
 }
 ```
 
-There are four core properties that are required to process an order using Commerce.js -
-`customer`, `shipping`, `fulfillment`, and `payment`. Let's start to define the fields you need to capture in the
-form. The main property objects will all go under a `form` object. You will then bind these properties to each single field in the render function with the `value` attribute.
+There are four core properties that are required to process an order using Commerce.js - `customer`, `shipping`,
+`fulfillment`, and `payment`. Let's start to define the fields you need to capture in the form. The main property
+objects will all go under a `form` object. You will then bind these properties to each single field in the render
+function with the `value` attribute.
 
 ```jsx
 class Checkout extends Component {
@@ -294,60 +320,66 @@ class Checkout extends Component {
 export default Checkout;
 ```
 
-And in our template fields, as mentioned, we will bind the data to each of the `v-model` attributes in the input
-elements. The inputs will be pre-filled with the state data we created above.
+And in the render function, as mentioned, bind the data to each of the `value` attributes in the input
+elements. The inputs will be pre-filled with the state data created above.
 
-```html
-<form class="checkout__form">
-  <h4 class="checkout__subheading">Customer information</h4>
+```jsx
+renderCheckoutForm() {
+  const { shippingCountries, shippingSubdivisions, shippingOptions } = this.state;
 
-    <label class="checkout__label" for="firstName">First name</label>
-    <input class="checkout__input" type="text" v-model="form.customer.firstName" name="firstName" placeholder="Enter your first name" required />
+  return (
+    <form className="checkout__form">
+      <h4 className="checkout__subheading">Customer information</h4>
 
-    <label class="checkout__label" for="lastName">Last name</label>
-    <input class="checkout__input" type="text" v-model="form.customer.lastName" name="lastName" placeholder="Enter your last name" required />
+        <label className="checkout__label" htmlFor="firstName">First name</label>
+        <input className="checkout__input" type="text" value={this.state.form.customer.firstName} name="firstName" placeholder="Enter your first name" required />
 
-    <label class="checkout__label" for="email">Email</label>
-    <input class="checkout__input" type="text" v-model="form.customer.email" name="email" placeholder="Enter your email" required />
+        <label className="checkout__label" htmlFor="lastName">Last name</label>
+        <input className="checkout__input" type="text" value={this.state.form.customer.lastName}name="lastName" placeholder="Enter your last name" required />
 
-  <h4 class="checkout__subheading">Shipping details</h4>
+        <label className="checkout__label" htmlFor="email">Email</label>
+        <input className="checkout__input" type="text" value={this.state.form.customer.email} name="email" placeholder="Enter your email" required />
 
-    <label class="checkout__label" for="fullname">Full name</label>
-    <input class="checkout__input" type="text" v-model="form.shipping.name" name="name" placeholder="Enter your shipping full name" required />
+      <h4 className="checkout__subheading">Shipping details</h4>
 
-    <label class="checkout__label" for="street">Street address</label>
-    <input class="checkout__input" type="text" v-model="form.shipping.street" name="street" placeholder="Enter your street address" required />
+        <label className="checkout__label" htmlFor="fullname">Full name</label>
+        <input className="checkout__input" type="text" value={this.state.form.shipping.name} name="name" placeholder="Enter your shipping full name" required />
 
-    <label class="checkout__label" for="city">City</label>
-    <input class="checkout__input" type="text" v-model="form.shipping.city" name="city" placeholder="Enter your city" required />
+        <label className="checkout__label" htmlFor="street">Street address</label>
+        <input className="checkout__input" type="text" value={this.state.form.shipping.street} name="street" placeholder="Enter your street address" required />
 
-    <label class="checkout__label" for="postalZipCode">Postal/Zip code</label>
-    <input class="checkout__input" type="text" v-model="form.shipping.postalZipCode" name="postalZipCode" placeholder="Enter your postal/zip code" required />
+        <label className="checkout__label" htmlFor="city">City</label>
+        <input className="checkout__input" type="text" value={this.state.form.shipping.city} name="city" placeholder="Enter your city" required />
 
-  <h4 class="checkout__subheading">Payment information</h4>
+        <label className="checkout__label" htmlFor="postalZipCode">Postal/Zip code</label>
+        <input className="checkout__input" type="text" value={this.state.form.shipping.postalZipCode} name="postalZipCode" placeholder="Enter your postal/zip code" required />
 
-    <label class="checkout__label" for="cardNum">Credit card number</label>
-    <input class="checkout__input" type="text" name="cardNum" v-model="form.payment.cardNum" placeholder="Enter your card number" />
+      <h4 className="checkout__subheading">Payment information</h4>
 
-    <label class="checkout__label" for="expMonth">Expiry month</label>
-    <input class="checkout__input" type="text" name="expMonth" v-model="form.payment.expMonth" placeholder="Card expiry month" />
+        <label className="checkout__label" htmlFor="cardNum">Credit card number</label>
+        <input className="checkout__input" type="text" name="cardNum" value={this.state.form.payment.cardNum} placeholder="Enter your card number" />
 
-    <label class="checkout__label" for="expYear">Expiry year</label>
-    <input class="checkout__input" type="text" name="expYear" v-model="form.payment.expYear" placeholder="Card expiry year" />
+        <label className="checkout__label" htmlFor="expMonth">Expiry month</label>
+        <input className="checkout__input" type="text" name="expMonth" value={this.state.form.payment.expMonth} placeholder="Card expiry month" />
 
-    <label class="checkout__label" for="ccv">CCV</label>
-    <input class="checkout__input" type="text" name="ccv" v-model="form.payment.ccv" placeholder="CCV (3 digits)" />
+        <label className="checkout__label" htmlFor="expYear">Expiry year</label>
+        <input className="checkout__input" type="text" name="expYear" value={this.state.form.payment.expYear} placeholder="Card expiry year" />
 
-  <button class="checkout__btn-confirm" @click.prevent="confirmOrder">Confirm order</button>
-</form>
+        <label className="checkout__label" htmlFor="ccv">CCV</label>
+        <input className="checkout__input" type="text" name="ccv" value={this.state.form.payment.ccv} placeholder="CCV (3 digits)" />
+
+      <button classNamea="checkout__btn-confirm">Confirm order</button>
+    </form>
+  );
+};
 ```
 
-The fields above contain all the customer details and payments inputs we will need to collect from the customer. The
+The fields above contain all the customer details and payments inputs you will need to collect from the customer. The
 shipping method data is also required in order to ship the items to the customer. Chec and Commerce.js has verbose
 shipment and fulfillment methods to handle this process. In the [Chec Dashboard](https://dashboard.chec.io/), worldwide
 shipping zones can be added in Settings > Shipping and then enabled at the product level. For this demo merchant
-account, we have enabled international shipping for each product. In the next section, we will touch on some Commerce.js
-checkout helper functions that will: 
+account, the international shipping for each product is enabled. In the next section, Commerce.js
+checkout helper functions will be touched on and these functions will: 
 -  Easily fetch a full list of countries, states, provinces, and shipping options to populate the form fields for
    fulfillment data collection
 -  Get the live object and update it with any data changes from the form fields
