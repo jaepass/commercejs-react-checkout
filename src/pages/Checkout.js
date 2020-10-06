@@ -235,30 +235,30 @@ class Checkout extends Component {
         );
     };
 
-    renderCheckoutSummary() {
-        return (
-            <>
-                <div className="checkout__summary">
-                    <h4>Order summary</h4>
-                        {this.state.checkoutToken.line_items.map((lineItem) => (
-                            <>
-                                <div key={lineItem.id} className="checkout__summary-details">
-                                    <img className="checkout__summary-img" src={lineItem.media.source} />
-                                    <p className="checkout__summary-name">{lineItem.quantity} x {lineItem.name}</p>
-                                    <p className="checkout__summary-value">{lineItem.line_total.formatted_with_symbol}</p>
-                                    </div>
-                                    <div className="checkout__summary-total">
-                                    <p className="checkout__summary-price">
-                                        <span>Subtotal:</span>
-                                        {/* {liveObject.total_due.formatted_with_symbol} */}
-                                    </p>
-                                </div>
-                            </>
-                        ))}
-                </div>
-            </>
-        )
-    }
+    // renderCheckoutSummary() {
+    //     return (
+    //         <>
+    //             <div className="checkout__summary">
+    //                 <h4>Order summary</h4>
+    //                     {this.state.checkoutToken.line_items.map((lineItem) => (
+    //                         <>
+    //                             <div key={lineItem.id} className="checkout__summary-details">
+    //                                 <img className="checkout__summary-img" src={lineItem.media.source} />
+    //                                 <p className="checkout__summary-name">{lineItem.quantity} x {lineItem.name}</p>
+    //                                 <p className="checkout__summary-value">{lineItem.line_total.formatted_with_symbol}</p>
+    //                                 </div>
+    //                                 <div className="checkout__summary-total">
+    //                                 <p className="checkout__summary-price">
+    //                                     <span>Subtotal:</span>
+    //                                     {/* {liveObject.total_due.formatted_with_symbol} */}
+    //                                 </p>
+    //                             </div>
+    //                         </>
+    //                     ))}
+    //             </div>
+    //         </>
+    //     )
+    // }
 
     render() {
         return (
@@ -268,7 +268,7 @@ class Checkout extends Component {
                 </h2>
                 <div className="checkout__wrapper">
                     { this.renderCheckoutForm() }
-                    { this.renderCheckoutSummary() }
+                    {/* { this.renderCheckoutSummary() } */}
                 </div>
           </div>
         );

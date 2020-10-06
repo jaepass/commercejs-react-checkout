@@ -9,12 +9,9 @@ import Hero from './components/Hero';
 import ProductsList from './components/ProductsList';
 import Cart from './components/Cart';
 import Checkout from './pages/Checkout';
+import Confirmation from './pages/Confirmation';
 
-import {
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
 library.add(faShoppingBag, faTimes)
 
@@ -159,8 +156,8 @@ class App extends Component {
     commerce.checkout.capture(checkoutTokenId, newOrder).then((order) => {
       // this.refreshCart();
       this.order = order;
-      // this.$router.push('/confirmation', { order });
-      this.isNavVisible = false;
+      this.history.push('/confirmation', { order });
+      //this.isNavVisible = false;
       window.sessionStorage.setItem('order_receipt', JSON.stringify(order));
     }).catch((error) => {
         console.log('There was an error confirming your order', error);
@@ -198,45 +195,64 @@ class App extends Component {
 
     return (
       <div className="app">
-        <Route
-          path="/"
-          render={(props) => {
-            return (
-              <>
-               { this.renderCartNav() }
-                {isCartVisible &&
-                  <Cart
-                    {...this.props}
-                    cart={cart}
-                    onUpdateCartQty={this.handleUpdateCartQty}
-                    onRemoveFromCart={this.handleRemoveFromCart}
-                    onEmptyCart={this.handleEmptyCart}
+        <Switch>
+          <Route
+            path="/"
+            exact
+            render={(props) => {
+              return (
+                <>
+                  <Hero
+                    merchant={merchant}
                   />
-                }  
-                <Hero
-                  merchant={merchant}
-                />
-                <ProductsList
+                   { this.renderCartNav() }
+                    {isCartVisible &&
+                      <Cart
+                        {...this.props}
+                        cart={cart}
+                        onUpdateCartQty={this.handleUpdateCartQty}
+                        onRemoveFromCart={this.handleRemoveFromCart}
+                        onEmptyCart={this.handleEmptyCart}
+                      />
+                    }  
+                  <ProductsList
+                    {...props}
+                    products={products}
+                    onAddToCart={this.handleAddToCart}
+                  />
+                </>
+              );
+            }}
+          />
+          <Route
+            path="/checkout"
+            exact
+            render={(props) => {
+              return (
+                <Checkout
                   {...props}
-                  products={products}
-                  onAddToCart={this.handleAddToCart}
+                  cart={cart}
+                  onCaptureOrder={this.handleCaptureOrder}
                 />
-              </>
-            );
-          }}
-        />
-        <Route
-          path="/checkout"
-          render={(props) => {
-            return (
-              <Checkout
-                {...props}
-                cart={cart}
-                onCaptureOrder={this.handleCaptureOrder}
-              />
-            )
-          }}
-        />
+              )
+            }}
+          />
+          <Route
+            path="/confirmation"
+            exact
+            render={(props) => {
+              if(!this.state.order) {
+                return props.history.push('/')
+              };
+              return (
+                <Confirmation
+                  {...props}
+                  order={this.state.order}
+                />
+              )
+            }}
+          />
+        </Switch>
       </div>
     );
   }
