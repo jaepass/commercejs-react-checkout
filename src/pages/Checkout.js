@@ -33,31 +33,31 @@ class Checkout extends Component {
                   billingPostalZipCode: '94107',
                 },
             },
+            liveObject: {},
             shippingCountries: {},
             shippingSubdivisions: {},
             shippingOptions: [],
         }
 
         this.handleChangeShippingCountry = this.handleChangeShippingCountry.bind(this);
-        // this.handleChangeShippingSubdivision = this.handleChangeShippingSubdivision.bind(this);
-        // this.handleChangeShippingOption = this.handleChangeShippingOption.bind(this);
-        // this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
+        this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
     }
 
     componentDidMount() {
-        //this.generateCheckoutToken();
-        // if(this.state.checkoutToken === null) {
-        //     return;
-        // }
-        this.fetchShippingCountries(this.state.checkoutToken.id);
-        //this.handleChangeShippingCountry({target: {value: Object.keys(countries.countries)[0]}})
-    }
-
-    componentDidUpdate() {
-        const { cart } = this.props
-        if (cart.line_items.length) {
-            this.generateCheckoutToken();
+        this.generateCheckoutToken();
+        console.log(this.state.checkoutToken);
+        //this.getLiveObject(this.checkoutToken.id);
+        if(this.state.checkoutToken) {
+            this.fetchAllCountries();
         }
+        if(this.state.form.shipping.country) {
+            this.fetchShippingSubdivisions(this.state.form.shipping.country);
+        }
+        if(!this.state.checkoutToken) {
+            return;
+        }
+        this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
+        // this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
     }
 
    /**
@@ -66,14 +66,22 @@ class Checkout extends Component {
     */
     generateCheckoutToken() {
         const { cart } = this.props;
-        if(cart.total_items > 0) {
-            commerce.checkout.generateToken(cart.id, { type: 'cart' })
-                .then((token) => {
-                    this.setState({ checkoutToken: token });
-            }).catch((error) => {
-                console.log('There was an error in generating a token', error);
-            });
-        }
+        commerce.checkout.generateToken(cart.id, { type: 'cart' })
+            .then((token) => {
+                this.setState({ checkoutToken: token });
+        }).catch((error) => {
+            console.log('There was an error in generating a token', error);
+        });
+    }
+
+    getLiveObject(checkoutTokenId) {
+        commerce.checkout.getLive(checkoutTokenId).then((liveObject) => {
+          this.setState({
+            liveObject: liveObject
+          })
+        }).catch((error) => {
+          console.log('There was an error getting the live object', error);
+        });
     }
 
     /**
@@ -82,8 +90,8 @@ class Checkout extends Component {
      *
      * @param {string} checkoutTokenId
      */
-    fetchShippingCountries(checkoutTokenId) {
-        commerce.services.localeListShippingCountries(checkoutTokenId).then((countries) => {
+    fetchAllCountries() {
+        commerce.services.localeListCountries().then((countries) => {
             this.setState({ 
                 shippingCountries: countries.countries 
             })
@@ -137,17 +145,13 @@ class Checkout extends Component {
         this.fetchShippingSubdivisions(currentValue);
     }
 
-    handleChangeShippingSubdivisions(e) {
-        const currentValue = e.target.value;
-        this.fetchShippingSubdivisions(currentValue);
-    }
-
     handleChangeShippingOption(e) {
         const currentValue = e.target.value;
         this.fetchShippingSubdivisions(currentValue);
     }
 
-    handleCaptureCheckout() {
+    handleCaptureCheckout(e) {
+        e.preventDefault();
         const orderData = {
             line_items: this.state.checkoutToken.live.line_items,
             customer: {
@@ -178,7 +182,6 @@ class Checkout extends Component {
             }
         };
         this.props.onCaptureCheckout(this.state.checkoutToken.id, orderData);
-        //this.props.history.push('/confirmation');
     }
 
     renderCheckoutForm() {
@@ -232,7 +235,7 @@ class Checkout extends Component {
                     <select 
                         value={this.state.form.shipping.stateProvince}
                         name="stateProvince"
-                        onChange={this.handleChangeShippingSubdivision}
+                        // onChange={this.handleChangeShippingSubdivision}
                         className="checkout__select"
                     >
                         <option className="checkout__option" value="" disabled>State/province</option>
@@ -262,8 +265,6 @@ class Checkout extends Component {
                                 )
                             })
                         }
-                        
-                        
                     </select>
 
                 <h4 className="checkout__subheading">Payment information</h4>
@@ -280,18 +281,18 @@ class Checkout extends Component {
                     <label className="checkout__label" htmlFor="ccv">CCV</label>
                     <input className="checkout__input" type="text" name="ccv" value={this.state.form.payment.ccv} placeholder="CCV (3 digits)" />
 
-                <button className="checkout__btn-confirm">Confirm order</button>
+                <button onClick={this.handleCaptureCheckout} className="checkout__btn-confirm">Confirm order</button>
             </form>
         );
     };
 
     renderCheckoutSummary() {
-        const { checkoutToken } = this.state;
+        const { cart } = this.props;
         return (
             <>
                 <div className="checkout__summary">
                     <h4>Order summary</h4>
-                        {checkoutToken.line_items.map((lineItem) => (
+                        {cart.line_items.map((lineItem) => (
                             <>
                                 <div key={lineItem.id} className="checkout__summary-details">
                                     <img className="checkout__summary-img" src={lineItem.media.source} alt={lineItem.name}/>
@@ -316,6 +317,8 @@ class Checkout extends Component {
           <div className="checkout">
                 <h2 className="checkout__heading">
                     Checkout
+                    {this.state.checkoutToken.id}
+                    {this.props.cart.id}
                 </h2>
                 <div className="checkout__wrapper">
                     { this.renderCheckoutForm() }

@@ -1,0 +1,32 @@
+.confirmation {
+    &__wrapper {
+      border: 2px solid $text-primary;
+      background-color: white;
+      width: 50%;
+      padding: 2rem;
+      margin: auto;
+      margin-top: 5rem;
+
+    }
+  
+    &__wrapper-message {
+      h4 {
+        margin-top: 0.25rem;
+      }
+  
+      span {
+        color: $text-primary;
+        text-transform: bold;
+      }
+    }
+  
+    &__wrapper-back {
+      color: $text-primary;
+      text-transform: bold;
+      margin-top: 0.75rem;
+  
+      span {
+        padding-left: 0.5rem;
+      }
+    }
+  }

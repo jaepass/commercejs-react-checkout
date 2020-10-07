@@ -8,17 +8,11 @@ class Cart extends Component {
         super(props);
 
         this.handleEmptyCart = this.handleEmptyCart.bind(this);
-        //this.handleRouteToCheckout = this.handleRouteToCheckout.bind(this);
     }
 
     handleEmptyCart() {
         this.props.onEmptyCart();
     }
-
-    // handleRouteToCheckout() {
-    //   const history = this.props;
-    //   history.push(`/checkout/${this.props.cart.id}`);
-    // }
 
     renderEmptyCart() {
         const { cart } = this.props;
@@ -58,7 +52,6 @@ class Cart extends Component {
               <Link
                 className="cart__btn-checkout"
                 to="/checkout"
-                //onClick={this.handleRouteToCheckout}
               >
                 Checkout
               </Link> 
