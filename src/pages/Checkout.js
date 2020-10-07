@@ -45,19 +45,17 @@ class Checkout extends Component {
 
     componentDidMount() {
         this.generateCheckoutToken();
-        console.log(this.state.checkoutToken);
-        //this.getLiveObject(this.checkoutToken.id);
+        if(!this.state.checkoutToken) {
+            return;
+        }
         if(this.state.checkoutToken) {
             this.fetchAllCountries();
         }
         if(this.state.form.shipping.country) {
             this.fetchShippingSubdivisions(this.state.form.shipping.country);
         }
-        if(!this.state.checkoutToken) {
-            return;
-        }
         this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
-        // this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
+        this.getLiveObject(this.state.checkoutToken.id);
     }
 
    /**
@@ -317,8 +315,6 @@ class Checkout extends Component {
           <div className="checkout">
                 <h2 className="checkout__heading">
                     Checkout
-                    {this.state.checkoutToken.id}
-                    {this.props.cart.id}
                 </h2>
                 <div className="checkout__wrapper">
                     { this.renderCheckoutForm() }
