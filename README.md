@@ -1,14 +1,14 @@
 # Commerce.js React Checkout
 
-This is a guide on adding checkout order capture functionality to React application using Commerce.js. This is a
+This is a guide for adding checkout order capture functionality to a React application using Commerce.js. This is a
 continuation from the previous guide on implementing cart functionality.
 
 [See live demo](https://commercejs-react-checkout.netlify.app/)
 
 ## Overview
 
-In this guide you will learn how to create a checkout page to capture cart items into an order as well and add a
-confirmation page to display a successful order. Below outlines what this guide will achieve:
+In this guide you will learn how to create a checkout page to convert cart items into an order, as well and add a
+confirmation page to display a successful order message. Below outlines what this guide will achieve:
 
 1. Add page routing to the application
 2. Generate a checkout token to capture the order
@@ -34,7 +34,7 @@ This project assumes you have some knowledge of the below concepts before starti
 
 ## Some things to note
 
-- The purpose of this guide is to focus on the Commerce.js checkout integration, using Vue.js to build out the
+- The purpose of this guide is to focus on the Commerce.js checkout integration, using React to build the
   application. We will therefore not be covering styling details
 - We will not be going over any Font Awesome usage
 - We will not be going over any UI details that do not pertain much to Commerce.js methods
@@ -44,9 +44,9 @@ This project assumes you have some knowledge of the below concepts before starti
 
 ### 1. Set up routing
 
-For a fully functional SPA (single page applications) to scale correctly, you will need to add routing so customers can navigate between cart and checkout pages easily. Commerce.js applications support incredible levels of flexibility when it comes to the checkout and creating unique purchasing flows (routing). 
+For a fully functional SPA (single page application) to scale correctly, you will need to add routing so customers can navigate between cart and checkout pages easily. Commerce.js applications support incredible levels of flexibility when it comes to the checkout and creating unique purchasing flows (routing). 
 
-It's now time to jump back into where you left off from the previous cart guide and add [react-router-dom](https://reactrouter.com/web/guides), a routing library for React web application, to your project. You will only need to install `react-router-dom` and not `react-router`, which is for React Native. Install the routing library by running the following command.
+It's now time to jump back into where you left off from the previous cart guide and add [react-router-dom](https://reactrouter.com/web/guides), a routing library for React web applications, to your project. You will only need to install `react-router-dom` and not `react-router`, which is for React Native. Install the routing library by running the following command:
 
 ```bash
 yarn add react-router-dom
@@ -66,9 +66,9 @@ import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 ReactDOM.render(
-    <Router>
-        <App />
-    </Router>
+  <Router>
+    <App />
+  </Router>
 , document.getElementById("root"));
 ```
 
@@ -79,12 +79,14 @@ creating in the next section to the [Route Matchers](https://reactrouter.com/web
 First, import the Route Matchers components `Route` and `Switch` from `react-router-dom`.
 
 ```jsx
+// App.js
 import { Switch, Route } from 'react-router-dom'
 ```
 
 Next, in your render function, wrap your `<Cart>` and `<Products>` components in a `<Route>` element.
 
 ```jsx
+// App.je
 <Route
   path="/"
   exact
@@ -115,8 +117,8 @@ Next, in your render function, wrap your `<Cart>` and `<Products>` components in
 />
 ```
 
-Summarizing the above code block - The `<Route>` includes the attributes:
-- `path`'s value points to the path you want to route to
+Summarizing the above code block - the `<Route>` includes the attributes:
+- `path`'s value points to the path you want to route to.
 - `render` outputs the components included in the view page indicated at the `path` value. You can optionally pass
   `props` to the render attribute.
 - `exact` attribute ensures the `<Route path>` matches the entire URL.
@@ -124,6 +126,7 @@ Summarizing the above code block - The `<Route>` includes the attributes:
 Now that you've set the initial route component, include a `<Checkout>` component which you will get to creating next.
 
 ```jsx
+// App.js
 return (
   <div className="app">
     <Switch>
@@ -177,13 +180,13 @@ Note the `<Switch>` element, which was imported from the `react-router-dom` modu
 matches the current URL. 
 
 Secondly, a new `<Route>` element was added which returns a `<Checkout>` component with a path pointing to `/checkout`.
-Pass `{...props}` `cart={cart}` to ensure you have access to them in the checkout component. You will create this
+Pass `{...props}` and `cart={cart}` to ensure you have access to them in the checkout component. You will create this
 component in the upcoming section. This is all the routing setup you will need for now until the remaining view
 components are added later in the guide.
 
 Lastly, the checkout page will need to be pushed into view from the cart checkout button created in the previous cart
-guide. Go into `Cart.js` to import the `Link` component in, a navigation component, and refactor the checkout `<button>`
-to a `<Link>` element.
+guide. Go into `Cart.js` to import the `Link` component, a navigation component, and replace the checkout `<button>`
+element with a `<Link>` component.
 
 ```jsx
 <div className="cart__footer">
@@ -197,7 +200,7 @@ to a `<Link>` element.
 </div>
 ```
 
-Now, if you click the link, you should be route to a blank page with the url ending in a `/checkout`.
+Now, if you click the link, you should be routed to a blank page with the URL ending in `/checkout`.
 
 ### 2. Generate token in the checkout component
 
@@ -205,11 +208,11 @@ In step 1, you created the appropriate route components to navigate to a checkou
 view page to render when the router points to the `/checkout` path. 
 
 First, create a new folder `src/pages` and a `Checkout.js` page component. This page component is going to get
-real hefty quite fast, but it will be broken it down in chunks throughout the rest of this guide.
+real hefty quite fast, but it will be broken it down into chunks throughout the rest of this guide.
 
 The [Checkout resource](https://commercejs.com/docs/sdk/checkout) in Commerce.js helps to handle one of the most complex moving parts of an eCommerce application. The Checkout endpoint comes with the core `commerce.checkout.generateToken()` and `commerce.checkout.capture()` methods along with [Checkout helpers](https://commercejs.com/docs/sdk/concepts#checkout-helpers) - additional helper functions for a seamless purchasing flow which will be covered later on.
 
-In the `Checkout.js` page component, you'll start by first initializing all the data required in this component to
+In the `Checkout.js` page component, you'll start by initializing all the data required in this component to
 build the checkout page and form. 
 
 Commerce.js provides a powerful method
@@ -244,12 +247,12 @@ checkout.
 
 ```jsx
 /**
-*  Generates a checkout token
-*  https://commercejs.com/docs/sdk/checkout#generate-token
-*/
+ *  Generates a checkout token
+ *  https://commercejs.com/docs/sdk/checkout#generate-token
+ */
 generateCheckoutToken() {
   const { cart } = this.props;
-  if(cart.line_items.length) {
+  if (cart.line_items.length) {
     commerce.checkout.generateToken(cart.id, { type: 'cart' })
       .then((token) => {
         this.setState({ checkoutToken: token });
@@ -260,10 +263,10 @@ generateCheckoutToken() {
 }
 ```
 
-The `commerce.checkout.generateToken()` takes in your cart ID and the identifier type `cart`. The type property is an
-optional parameter you can pass in as an identifier, in this case `cart` the type associated to `this.cart.id`. First
+The `commerce.checkout.generateToken()` method takes in your cart ID and the identifier type `cart`. The type property is an
+optional parameter you can pass in as an identifier, in this case `cart` is the type associated to `this.cart.id`. First
 check that `line_items` in `cart` exists with an `if` statement before inserting the `generateToken()` method. The
-returned full `token` object will be stored in the `checkoutToken` state you created above after a successful request.
+returned `token` object will be stored in the `checkoutToken` state you created above after a successful request.
 
 To call this function, include it in the `componentDidMount` lifecyle hook to generate a token when the component
 mounts.
@@ -274,9 +277,9 @@ componentDidMount() {
 }
 ```
 
-When you click the checkout button from the cart page, you will be routed to `/checkout` and in which case the
+When you click the checkout button from the cart page, you will be routed to `/checkout` and the
 `generateCheckoutToken()` function will run. Upon a successful request to generate the checkout token, you should
-receive an abbreviated response like the below json data:
+receive an abbreviated response like the below JSON data:
 
 ```json
 {
@@ -455,7 +458,8 @@ There are four core properties that are required to process an order using Comme
 `fulfillment`, and `payment`. Go back to your constructor's state and start to define the fields you need to
 capture in the checkout form. The main property objects will all go under a `form` object. You will then bind these
 properties to each single field in the render function with the `value` attribute. Note the values filled out in the
-data, these are arbitrary values that will prefill the checkout form when it mounts.
+data, these are arbitrary values that will prefill the checkout form when it mounts. You'll remove these in a real
+application.
 
 ```jsx
 class Checkout extends Component {
@@ -542,7 +546,7 @@ renderCheckoutForm() {
         <label className="checkout__label" htmlFor="ccv">CCV</label>
         <input className="checkout__input" type="text" name="ccv" value={this.state.form.payment.ccv} placeholder="CCV (3 digits)" />
 
-      <button classNamea="checkout__btn-confirm">Confirm order</button>
+      <button className="checkout__btn-confirm">Confirm order</button>
     </form>
   );
 };
@@ -609,7 +613,7 @@ form.
 fetchShippingCountries(checkoutTokenId) {
   commerce.services.localeListShippingCountries(checkoutTokenId).then((countries) => {
     this.setState({ 
-      shippingCountries: countries.countries 
+      shippingCountries: countries.countries,
     })
   }).catch((error) => {
     console.log('There was an error fetching a list of shipping countries', error);
@@ -617,8 +621,8 @@ fetchShippingCountries(checkoutTokenId) {
 }
 ```
 
-The response will be stored in the `shippingCountries` object you initialized earlier in our data object. You will then
-be able to use this countries object to iterate and display a list of countries in a select element, which you will be
+The response will be stored in the `shippingCountries` object you initialized earlier in the constructor. You will then
+be able to use this countries object to iterate and display a list of countries in a `select` element, which you will be
 adding later. The `fetchSubdivisions()` function below will walk through the same pattern as well.
 
 A country code argument is required to make a request with
@@ -636,7 +640,7 @@ to `GET v1/services/locale/{country_code}/subdivisions` to get a list of all sub
 fetchShippingSubdivisions(checkoutTokenId, countryCode) {
   commerce.services.localeListSubdivisions(checkoutTokenId, countryCode).then((subdivisions) => {
       this.setState({
-        shippingSubdivisions: subdivisions.subdivisions
+        shippingSubdivisions: subdivisions.subdivisions,
       })
   }).catch((error) => {
       console.log('There was an error fetching the subdivisions', error);
@@ -645,10 +649,10 @@ fetchShippingSubdivisions(checkoutTokenId, countryCode) {
 ```
 
 With a successful request, the response will be stored in the `this.state.shippingSubdivions` array and will be used to
-iterate and output onto a select element in your template later on.
+iterate and output a `select` element in your template later on.
 
 For your next checkout helper function, fetch the current shipping options available in your merchant account. This
-function will fetch all the shipping options that were registered in the dashboard and are applicable to the products in
+function will fetch all the shipping options that were registered in the Chec Dashboard and are applicable to the products in
 your cart using the
 [`commerce.checkout.getShippingOptions()`](https://commercejs.com/docs/sdk/checkout#get-shipping-methods) method. This
 function takes in two required parameters - the `checkoutTokenId`, the country code for the provide `country` in our
@@ -663,7 +667,7 @@ data, and the `region` is optional.
  * @param {string} country
  * @param {string} stateProvince
  */
-fetchShippingOptions(checkoutTokenId, country, stateProvince) {
+fetchShippingOptions(checkoutTokenId, country, stateProvince = null) {
   commerce.checkout.getShippingOptions(checkoutTokenId,
     { 
       country: country,
@@ -684,7 +688,6 @@ When the promise resolves, the response will be stored into `this.state.shipping
 render a list of shipping options in your template. Note that the `shippingOption` is set to the first index option in
 the array to have an option in the dropdown be displayed.
 
-
 Alright, that wraps up all the checkout helper functions you'll want to create for the checkout page. Now it's time to
 execute and hook up the responses to your render function!
 
@@ -693,17 +696,17 @@ execution.
 
 ```js
 /**
-*  Generates a checkout token
-*  https://commercejs.com/docs/sdk/checkout#generate-token
-*/
+ *  Generates a checkout token
+ *  https://commercejs.com/docs/sdk/checkout#generate-token
+ */
 generateCheckoutToken() {
   const { cart } = this.props;
-  commerce.checkout.generateToken(cart.id, { type: 'cart' });
-  .then((token) => this.setState({ checkoutToken: token }));
-  .then(() => this.fetchShippingCountries(this.state.checkoutToken.id));
-  .catch((error) => {
-    console.log('There was an error in generating a token', error);
-  });
+  commerce.checkout.generateToken(cart.id, { type: 'cart' })
+    .then((token) => this.setState({ checkoutToken: token }))
+    .then(() => this.fetchShippingCountries(this.state.checkoutToken.id))
+    .catch((error) => {
+      console.log('There was an error in generating a token', error);
+    });
 }
 ```
 
@@ -714,7 +717,7 @@ function.
 ```js
 componentDidMount() {
   this.generateCheckoutToken();
-  if(this.state.form.shipping.country) {
+  if (this.state.form.shipping.country) {
     this.fetchSubdivisions(this.state.form.shipping.country);
   }
 }
@@ -727,7 +730,7 @@ changed.
 
 ```js
 componentDidUpdate(prevProps, prevState) {
-  if(this.state.form.shipping.country !== prevState.form.shipping.country) {
+  if (this.state.form.shipping.country !== prevState.form.shipping.country) {
     this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
   }
 }
@@ -789,11 +792,11 @@ you created earlier on, place all the markup underneath the **Postal/Zip code** 
 </select>
 ```
 The three fields you just added: 
-- Binds the `this.state.form.shipping.country` as the selected country and loops through the `shippingCountries` array
+- Binds `this.state.form.shipping.country` as the selected country and loops through the `shippingCountries` array
   to render as options
-- Binds the `this.state.form.shipping.stateProvince` as the selected state/province and iterates through the
+- Binds `this.state.form.shipping.stateProvince` as the selected state/province and iterates through the
   `shippingSubivisions` object to display the available list of countries
-- Binds the `this.state.shippingOption` and loops through the `shippingOptions` array to render as options in the
+- Binds `this.state.shippingOption` and loops through the `shippingOptions` array to render as options in the
   **Shipping method** field.
 
 Once all the data is bound to the field you are then able to collect the necessary data to convert the checkout into an
@@ -877,7 +880,7 @@ will refresh the cart in your state/session when the order is confirmed.
 refreshCart() {
   commerce.cart.refresh().then((newCart) => {
     this.setState({ 
-      cart: newCart
+      cart: newCart,
     });
   }).catch((error) => {
     console.log('There was an error refreshing your cart', error);
@@ -901,11 +904,17 @@ step.
  */
 handleCaptureCheckout(checkoutTokenId, newOrder) {
   commerce.checkout.capture(checkoutTokenId, newOrder).then((order) => {
+    // Save the order into state
     this.setState({
-      order: order
+      order,
     });
+    // Store the order in session storage so we can show it again if the
+    // user refreshes the page!
+    window.sessionStorage.setItem('order_receipt', JSON.stringify(order));   
+    // Clear the cart
     this.refreshCart();
-    window.sessionStorage.setItem('order_receipt', JSON.stringify(order));
+    // Send the user to the receipt 
+    return props.history.push('/confirmation');
   }).catch((error) => {
     console.log('There was an error confirming your order', error);
   });
@@ -982,9 +991,9 @@ In your `App.js` again, attach your order prop to your `<Route>` `<Checkout>` co
   path="/confirmation"
   exact
   render={(props) => {
-    if(!this.state.order) {
-      return props.history.push('/')
-    };
+    if (!this.state.order) {
+      return props.history.push('/');
+    }
     return (
       <Confirmation
         {...props}
