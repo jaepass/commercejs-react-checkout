@@ -7,7 +7,7 @@ continuation from the previous guide on implementing cart functionality.
 
 ## Overview
 
-The aim for this guide is to create a checkout page to capture our cart items into an order as well and add a
+In this guide you will learn how to create a checkout page to capture cart items into an order as well and add a
 confirmation page to display a successful order. Below outlines what this guide will achieve:
 
 1. Add page routing to the application
@@ -44,12 +44,9 @@ This project assumes you have some knowledge of the below concepts before starti
 
 ### 1. Set up routing
 
-For fully functional SPAs (single page applications) to scale, you will need to add routing in order to navigate to
-various view pages such to a cart or checkout flow. For a Commerce.js application, this is where you have the full
-flexibility of creating fully custom checkout flow. Let's jump right back to where we left off from the previous cart
-guide and add [react-router-dom](https://reactrouter.com/web/guides), a routing library for React web application, to
-our project. You will only need to install `react-router-dom` and not `react-router`, which is for React Native. Install
-the routing library by running the below command.
+For a fully functional SPA (single page applications) to scale correctly, you will need to add routing so customers can navigate between cart and checkout pages easily. Commerce.js applications support incredible levels of flexibility when it comes to the checkout and creating unique purchasing flows (routing). 
+
+It's now time to jump back into where you left off from the previous cart guide and add [react-router-dom](https://reactrouter.com/web/guides), a routing library for React web application, to your project. You will only need to install `react-router-dom` and not `react-router`, which is for React Native. Install the routing library by running the following command.
 
 ```bash
 yarn add react-router-dom
@@ -57,7 +54,7 @@ yarn add react-router-dom
 npm i react-router-dom
 ```
 
-After installing, you'll need to make sure the router component is rendered at the root of your element hierarchy to
+After installing, make sure the router component is rendered at the root of your element hierarchy so you
 have access to the routes you will be setting up. First, go into `src/index.js`, import the
 `[BrowserRouter](https://reactrouter.com/web/guides/primary-components)` component in and wrap the `<App>` element in
 the router component.
@@ -75,7 +72,7 @@ ReactDOM.render(
 , document.getElementById("root"));
 ```
 
-Now that you've added routing to serve your whole application, you'll now need to add page components that you'll be
+Now that you've added routing to serve your whole application, add page components that you'll be
 creating in the next section to the [Route Matchers](https://reactrouter.com/web/guides/primary-components) components
 `<Route>` and `<Switch>` in `App.js`.
 
@@ -118,7 +115,7 @@ Next, in your render function, wrap your `<Cart>` and `<Products>` components in
 />
 ```
 
-Let's walk through the above code block - The `<Route>` includes the attributes:
+Summarizing the above code block - The `<Route>` includes the attributes:
 - `path`'s value points to the path you want to route to
 - `render` outputs the components included in the view page indicated at the `path` value. You can optionally pass
   `props` to the render attribute.
@@ -204,19 +201,15 @@ Now, if you click the link, you should be route to a blank page with the url end
 
 ### 2. Generate token in the checkout component
 
-Earlier in step 1 we created the appropriate route components to navigate to a checkout page. You will now create that
+In step 1, you created the appropriate route components to navigate to a checkout page. You will now create that
 view page to render when the router points to the `/checkout` path. 
 
-First, let's create a new folder `src/pages` and a `Checkout.js` page component. This page component is going to get
+First, create a new folder `src/pages` and a `Checkout.js` page component. This page component is going to get
 real hefty quite fast, but it will be broken it down in chunks throughout the rest of this guide.
 
-The [Checkout resource](https://commercejs.com/docs/sdk/checkout) in Chec helps to handle one of the most complex moving
-parts of an eCommerce application. The Checkout endpoint comes with the core `commerce.checkout.generateToken()` and
-`commerce.checkout.capture()` methods along with [Checkout
-helpers](https://commercejs.com/docs/sdk/concepts#checkout-helpers) - additional helper functions for a seamless
-purchasing flow which will be touched on more later.
+The [Checkout resource](https://commercejs.com/docs/sdk/checkout) in Commerce.js helps to handle one of the most complex moving parts of an eCommerce application. The Checkout endpoint comes with the core `commerce.checkout.generateToken()` and `commerce.checkout.capture()` methods along with [Checkout helpers](https://commercejs.com/docs/sdk/concepts#checkout-helpers) - additional helper functions for a seamless purchasing flow which will be covered later on.
 
-In the `Checkout.js` page component, let's start first by initializing all the data you will need in this component to
+In the `Checkout.js` page component, you'll start by first initializing all the data required in this component to
 build the checkout page and form. 
 
 Commerce.js provides a powerful method
@@ -224,7 +217,7 @@ Commerce.js provides a powerful method
 needed from the cart and initiate the checkout process simply by providing a cart ID, a product ID, or a product's
 permalink as an argument. You'll use a cart ID since we've already built the cart.
 
-Let's create a class component then initialize a `checkoutToken` in the constructor's state.
+First, create a class component then initialize a `checkoutToken` in the constructor's state.
 
 ```jsx
 class Checkout extends Component {
@@ -267,7 +260,7 @@ generateCheckoutToken() {
 }
 ```
 
-The `commerce.checkout.generateToken()` takes in our cart ID and the identifier type `cart`. The type property is an
+The `commerce.checkout.generateToken()` takes in your cart ID and the identifier type `cart`. The type property is an
 optional parameter you can pass in as an identifier, in this case `cart` the type associated to `this.cart.id`. First
 check that `line_items` in `cart` exists with an `if` statement before inserting the `generateToken()` method. The
 returned full `token` object will be stored in the `checkoutToken` state you created above after a successful request.
@@ -456,10 +449,10 @@ receive an abbreviated response like the below json data:
 }
 ```
 
-### 3. Build out the checkout page
+### 3. Build the checkout page
 
 There are four core properties that are required to process an order using Commerce.js - `customer`, `shipping`,
-`fulfillment`, and `payment`. Let's get back to your constructor's state and start to define the fields you need to
+`fulfillment`, and `payment`. Go back to your constructor's state and start to define the fields you need to
 capture in the checkout form. The main property objects will all go under a `form` object. You will then bind these
 properties to each single field in the render function with the `value` attribute. Note the values filled out in the
 data, these are arbitrary values that will prefill the checkout form when it mounts.
@@ -555,17 +548,17 @@ renderCheckoutForm() {
 };
 ```
 
-The fields above contain all the customer details and payments inputs you will need to collect from the customer. The
+The fields above contain all the customer details and payment inputs you will need to collect from the customer. The
 shipping method data is also required in order to ship the items to the customer. Chec and Commerce.js has verbose
-shipment and fulfillment methods to handle this process. In the [Chec Dashboard](https://dashboard.chec.io/), worldwide
+shipment and fulfillment methods to handle this process. In the [Chec Dashboard](https://dashboard.chec.io/settings/shipping), worldwide
 shipping zones can be added in Settings > Shipping and then enabled at the product level. For this demo merchant
-account, the international shipping for each product is enabled. In the next section, Commerce.js checkout helper
-functions will be touched on and these functions will easily fetch a full list of countries, states, provinces, and
-shipping options to populate the form fields for fulfillment data collection
+account, the international shipping for each product is enabled. 
+
+In the next section, Commerce.js checkout helper functions will be covered. These [helper functions](https://commercejs.com/docs/sdk/concepts#checkout-helpers) fetch a full list of countries, states, provinces, and shipping options to populate the form fields for fulfillment data collection.
 
 ### 3. Checkout helpers
 
-Let's first get back to the constructor's state and initialize the empty objects and arrays that you will need to store
+First, go back to the constructor's state and initialize the empty objects and arrays that you will need to store
 the responses from the [checkout helper](https://commercejs.com/docs/sdk/concepts#checkout-helpers) methods. Initialize
 a `shippingCountries` object, a `shippingSubdivisions` object and a `shippingOptions` array.
 
@@ -808,7 +801,7 @@ order object.
 
 ### 4. Capture order
 
-With all the data collected you now need to associate it to each of the order properties in an appropriate data
+With all the data collected, you now need to associate it to each of the order properties in an appropriate data
 structure so you can confirm the order.
 
 Create a `handleCaptureCheckout()` handler function and structure your returned data. Have a look at the [expected
@@ -1004,5 +997,5 @@ In your `App.js` again, attach your order prop to your `<Route>` `<Checkout>` co
 
 ## That's it!
 
-You have now wrapped up the full series of the Commerce.js and React demo store guides! You can find the full finished
+You have now completed the full series of the Commerce.js and React demo store guides! You can find the full finished
 code in [GitHub here](https://github.com/jaepass/commercejs-react-checkout)!
