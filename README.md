@@ -914,7 +914,7 @@ handleCaptureCheckout(checkoutTokenId, newOrder) {
     // Clear the cart
     this.refreshCart();
     // Send the user to the receipt 
-    return props.history.push('/confirmation');
+    this.props.history.push('/confirmation');
   }).catch((error) => {
     console.log('There was an error confirming your order', error);
   });
