@@ -6,11 +6,11 @@
       padding: 2rem;
       margin: auto;
       margin-top: 5rem;
-
+      text-align: center;
     }
   
     &__wrapper-message {
-      h4 {
+      p {
         margin-top: 0.25rem;
       }
   
@@ -24,9 +24,14 @@
       color: $text-primary;
       text-transform: bold;
       margin-top: 0.75rem;
-  
+      text-decoration: none;
+
       span {
         padding-left: 0.5rem;
+        
+        &:hover {
+            text-decoration: none;
+        }
       }
     }
-  }
+}

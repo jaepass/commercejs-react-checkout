@@ -23,7 +23,8 @@ class App extends Component {
       products: [],
       cart: {},
       isCartVisible: false,
-      order: null,
+      checkoutToken: null,
+      order: {},
     }
 
     this.handleAddToCart = this.handleAddToCart.bind(this);
@@ -39,6 +40,11 @@ class App extends Component {
     this.fetchMerchantDetails();
     this.fetchProducts();
     this.fetchCart();
+    if (this.state.order) {
+      this.setState({
+        order: JSON.parse(window.sessionStorage.getItem('order_receipt'))
+      })
+    }
   }
 
   /**
@@ -158,8 +164,6 @@ class App extends Component {
         order: order
       });
       this.refreshCart();
-      this.history.push('/confirmation', { order });
-      //this.isNavVisible = false;
       window.sessionStorage.setItem('order_receipt', JSON.stringify(order));
     }).catch((error) => {
         console.log('There was an error confirming your order', error);
@@ -174,7 +178,7 @@ class App extends Component {
     commerce.cart.refresh().then((newCart) => {
       this.setState({ 
         cart: newCart
-       })
+      })
     }).catch((error) => {
       console.log('There was an error refreshing your cart', error);
     });
@@ -206,7 +210,8 @@ class App extends Component {
       products,
       merchant,
       cart,
-      isCartVisible
+      isCartVisible,
+      order
     } = this.state;
 
     return (
@@ -263,7 +268,7 @@ class App extends Component {
               return (
                 <Confirmation
                   {...props}
-                  order={this.state.order}
+                  order={order}
                 />
               )
             }}

@@ -22,9 +22,6 @@ class Checkout extends Component {
                   postalZipCode: '94107',
                   country: 'US',
                 },
-                fulfillment: {
-                  shippingOption: '',
-                },
                 payment: {
                   cardNum: '4242 4242 4242 4242',
                   expMonth: '01',
@@ -33,29 +30,27 @@ class Checkout extends Component {
                   billingPostalZipCode: '94107',
                 },
             },
-            liveObject: {},
             shippingCountries: {},
             shippingSubdivisions: {},
             shippingOptions: [],
+            shippingOption: '',
         }
 
-        this.handleChangeShippingCountry = this.handleChangeShippingCountry.bind(this);
+        this.handleFormChanges = this.handleFormChanges.bind(this); 
         this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
     }
 
     componentDidMount() {
         this.generateCheckoutToken();
-        if(!this.state.checkoutToken) {
-            return;
-        }
-        if(this.state.checkoutToken) {
-            this.fetchAllCountries();
-        }
         if(this.state.form.shipping.country) {
-            this.fetchShippingSubdivisions(this.state.form.shipping.country);
+            this.fetchSubdivisions(this.state.form.shipping.country);
         }
-        this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
-        this.getLiveObject(this.state.checkoutToken.id);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(this.state.form.shipping.country !== prevState.form.shipping.country) {
+            this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince);
+        }
     }
 
    /**
@@ -65,20 +60,11 @@ class Checkout extends Component {
     generateCheckoutToken() {
         const { cart } = this.props;
         commerce.checkout.generateToken(cart.id, { type: 'cart' })
-            .then((token) => {
-                this.setState({ checkoutToken: token });
-        }).catch((error) => {
+        .then((token) => this.setState({ checkoutToken: token }))
+        .then(() => this.fetchShippingCountries(this.state.checkoutToken.id))
+        .then(() => this.fetchShippingOptions(this.state.checkoutToken.id, this.state.form.shipping.country, this.state.form.shipping.stateProvince))
+        .catch((error) => {
             console.log('There was an error in generating a token', error);
-        });
-    }
-
-    getLiveObject(checkoutTokenId) {
-        commerce.checkout.getLive(checkoutTokenId).then((liveObject) => {
-          this.setState({
-            liveObject: liveObject
-          })
-        }).catch((error) => {
-          console.log('There was an error getting the live object', error);
         });
     }
 
@@ -88,25 +74,23 @@ class Checkout extends Component {
      *
      * @param {string} checkoutTokenId
      */
-    fetchAllCountries() {
-        commerce.services.localeListCountries().then((countries) => {
+    fetchShippingCountries(checkoutTokenId) {
+        commerce.services.localeListShippingCountries(checkoutTokenId).then((countries) => {
             this.setState({ 
                 shippingCountries: countries.countries 
             })
         }).catch((error) => {
-            console.log('There was an error fetching a list of countries', error);
+            console.log('There was an error fetching a list of shipping countries', error);
         });
     }
 
     /**
-     * Fetches the subdivisions (provinces/states) in a country which
-     * can be shipped to for the current checkout
-     * https://commercejs.com/docs/sdk/checkout#list-available-shipping-subdivisions
+     * Fetches the subdivisions (provinces/states) for a country
+     * https://commercejs.com/docs/sdk/checkout#list-all-subdivisions-for-a-country
      *
-     * @param {string} checkoutTokenId
      * @param {string} countryCode
      */
-    fetchShippingSubdivisions(countryCode) {
+    fetchSubdivisions(countryCode) {
         commerce.services.localeListSubdivisions(countryCode).then((subdivisions) => {
             this.setState({ 
                 shippingSubdivisions: subdivisions.subdivisions
@@ -130,7 +114,9 @@ class Checkout extends Component {
                 country: country,
                 region: stateProvince
             }).then((options) => {
+                const shippingOption = options[0] || null;
                 this.setState({
+                    shippingOption: shippingOption,
                     shippingOptions: options
                 })
             }).catch((error) => {
@@ -138,14 +124,8 @@ class Checkout extends Component {
         });
     }
 
-    handleChangeShippingCountry(e) {
-        const currentValue = e.target.value;
-        this.fetchShippingSubdivisions(currentValue);
-    }
-
-    handleChangeShippingOption(e) {
-        const currentValue = e.target.value;
-        this.fetchShippingSubdivisions(currentValue);
+    handleFormChanges(e) {
+        this.setState({ value: e.target.value });
     }
 
     handleCaptureCheckout(e) {
@@ -166,7 +146,7 @@ class Checkout extends Component {
                 country: this.state.form.shipping.country,
             },
             fulfillment: {
-                shipping_method: this.state.form.fulfillment.shippingOption
+                shipping_method: this.state.shippingOption.id
             },
             payment: {
                 gateway: "test_gateway",
@@ -180,17 +160,19 @@ class Checkout extends Component {
             }
         };
         this.props.onCaptureCheckout(this.state.checkoutToken.id, orderData);
+        this.props.history.push('/confirmation');
     }
 
     renderCheckoutForm() {
         const { shippingCountries, shippingSubdivisions, shippingOptions } = this.state;
 
         return (
-            <form className="checkout__form">
+            <form className="checkout__form" onChange={this.handleFormChanges}>
                 <h4 className="checkout__subheading">Customer information</h4>
 
                     <label className="checkout__label" htmlFor="firstName">First name</label>
-                    <input className="checkout__input" type="text" value={this.state.form.customer.firstName} name="firstName" placeholder="Enter your first name" required />
+                    <input
+                        className="checkout__input" type="text" value={this.state.form.customer.firstName} name="firstName" placeholder="Enter your first name" required />
 
                     <label className="checkout__label" htmlFor="lastName">Last name</label>
                     <input className="checkout__input" type="text" value={this.state.form.customer.lastName}name="lastName" placeholder="Enter your last name" required />
@@ -216,7 +198,7 @@ class Checkout extends Component {
                     <select 
                         value={this.state.form.shipping.country}
                         name="country"
-                        onChange={this.handleChangeShippingCountry}
+                        onChange={this.handleFormChanges}
                         className="checkout__select"
                     >
                         <option value="" disabled>Country</option>
@@ -233,7 +215,7 @@ class Checkout extends Component {
                     <select 
                         value={this.state.form.shipping.stateProvince}
                         name="stateProvince"
-                        // onChange={this.handleChangeShippingSubdivision}
+                        onChange={this.handleFormChanges}
                         className="checkout__select"
                     >
                         <option className="checkout__option" value="" disabled>State/province</option>
@@ -250,14 +232,14 @@ class Checkout extends Component {
 
                     <label className="checkout__label" htmlFor="shippingOption">Shipping method</label>
                     <select
-                        value={this.state.form.fulfillment.shippingOption}
+                        value={this.state.shippingOption.id}
                         name="shippingOption"
-                        onChange={this.handleChangeShippingOption}
+                        onChange={this.handleFormChanges}
                         className="checkout__select"
                     >
                         <option className="checkout__select-option" value="" disabled>Select a shipping method</option>
                         {
-                            Object.keys(shippingOptions).map((method, index) => {
+                            shippingOptions.map((method, index) => {
                                 return (
                                     <option className="checkout__select-option" value={method.id} key={index}>{`${method.description} - $${method.price.formatted_with_code}` }</option>
                                 )
@@ -286,6 +268,7 @@ class Checkout extends Component {
 
     renderCheckoutSummary() {
         const { cart } = this.props;
+
         return (
             <>
                 <div className="checkout__summary">
@@ -297,14 +280,14 @@ class Checkout extends Component {
                                     <p className="checkout__summary-name">{lineItem.quantity} x {lineItem.name}</p>
                                     <p className="checkout__summary-value">{lineItem.line_total.formatted_with_symbol}</p>
                                     </div>
-                                    <div className="checkout__summary-total">
-                                    <p className="checkout__summary-price">
-                                        <span>Subtotal:</span>
-                                        {/* {liveObject.total_due.formatted_with_symbol} */}
-                                    </p>
-                                </div>
                             </>
                         ))}
+                    <div className="checkout__summary-total">
+                        <p className="checkout__summary-price">
+                            <span>Subtotal:</span>
+                            {cart.subtotal.formatted_with_symbol}
+                        </p>
+                    </div>
                 </div>
             </>
         )
@@ -318,7 +301,7 @@ class Checkout extends Component {
                 </h2>
                 <div className="checkout__wrapper">
                     { this.renderCheckoutForm() }
-                    {/* { this.renderCheckoutSummary() } */}
+                    { this.renderCheckoutSummary() }
                 </div>
           </div>
         );
@@ -329,5 +312,6 @@ export default Checkout;
 
 Checkout.propTypes = {
     cart: PropTypes.object,
+    history: PropTypes.object,
     onCaptureCheckout: () => {},
 };
