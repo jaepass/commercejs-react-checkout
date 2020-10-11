@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faShoppingBag, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { Switch, Route } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import Hero from './components/Hero';
 import ProductsList from './components/ProductsList';
@@ -23,7 +24,6 @@ class App extends Component {
       products: [],
       cart: {},
       isCartVisible: false,
-      checkoutToken: null,
       order: {},
     }
 
@@ -40,10 +40,9 @@ class App extends Component {
     this.fetchMerchantDetails();
     this.fetchProducts();
     this.fetchCart();
-    if (this.state.order) {
-      this.setState({
-        order: JSON.parse(window.sessionStorage.getItem('order_receipt'))
-      })
+    if(window.localStorage.getItem('order_receipt') !== null) {
+      console.log('order receipt saved');
+      this.setState({ order:  JSON.parse(window.localStorage.getItem('order_receipt')) });
     }
   }
 
@@ -161,10 +160,15 @@ class App extends Component {
   handleCaptureCheckout(checkoutTokenId, newOrder) {
     commerce.checkout.capture(checkoutTokenId, newOrder).then((order) => {
       this.setState({
-        order: order
+        order: order,
       });
+      // Clears the cart
       this.refreshCart();
-      window.sessionStorage.setItem('order_receipt', JSON.stringify(order));
+      // Store the order in session storage so we can show it again
+      // if the user refreshes the page!
+      window.localStorage.setItem('order_receipt', JSON.stringify(this.state.order));
+      // Send the user to the receipt 
+      this.props.history.push('/confirmation');
     }).catch((error) => {
         console.log('There was an error confirming your order', error);
     });
@@ -177,7 +181,7 @@ class App extends Component {
   refreshCart() {
     commerce.cart.refresh().then((newCart) => {
       this.setState({ 
-        cart: newCart
+        cart: newCart,
       })
     }).catch((error) => {
       console.log('There was an error refreshing your cart', error);
@@ -262,8 +266,8 @@ class App extends Component {
             path="/confirmation"
             exact
             render={(props) => {
-              if(!this.state.order) {
-                return props.history.push('/')
+              if (!this.state.order) {
+                return props.history.push('/');
               };
               return (
                 <Confirmation
@@ -280,3 +284,7 @@ class App extends Component {
 };
 
 export default App;
+
+App.propTypes = {
+  history: PropTypes.object,
+};

@@ -1116,10 +1116,10 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
-"@chec/commerce.js@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@chec/commerce.js/-/commerce.js-2.0.1.tgz#f6b6592087a1a558af62a2a70caedb5515f6cd08"
-  integrity sha512-35Gsz9DwFTFNNo2FtPMXosAP1VQrcdyQkyABIYFZDPG8+Q51Qfwk2WiVd56NLXxKXdbunCKCy1cO7FYU1rY6wg==
+"@chec/commerce.js@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@chec/commerce.js/-/commerce.js-2.2.0.tgz#52242426a80ee3cd69584bdb88720a02f94f2a04"
+  integrity sha512-ofKHP4Wrgx9MxpeWY8uE0QnC2UTOgcIWAKh7abW06ePTXKvVk3oTZuLPw+98tk4rjS3zYjmIFJQacpt/JRBvDw==
   dependencies:
     axios "^0.19.0"
 

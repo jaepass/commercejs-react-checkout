@@ -74,10 +74,10 @@ class Cart extends Component {
 export default Cart;
 
 Cart.propTypes = {
-    cart: PropTypes.object,
-    onUpdateCartQty: () => {},
-    onRemoveFromCart: () => {},
-    onEmptyCart: () => {},
-    handleUpdateCartQty: PropTypes.func,
-    history: PropTypes.object
- };
+  cart: PropTypes.object,
+  onUpdateCartQty: () => {},
+  onRemoveFromCart: () => {},
+  onEmptyCart: () => {},
+  handleUpdateCartQty: PropTypes.func,
+  history: PropTypes.object
+};
