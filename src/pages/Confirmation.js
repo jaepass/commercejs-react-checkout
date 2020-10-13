@@ -9,9 +9,8 @@ import { Link } from 'react-router-dom';
 library.add(faArrowLeft);
 
 class Confirmation extends Component {
-    
     render() {
-        const { order } = this.props;
+        const { order, onBackToHome } = this.props;
 
         return (
             <div className="confirmation">
@@ -26,6 +25,7 @@ class Confirmation extends Component {
                     className="confirmation__wrapper-back"
                     type="button"
                     to="/"
+                    onClick={onBackToHome}
                 >
                     <FontAwesomeIcon
                         size="1x"
@@ -44,5 +44,5 @@ export default Confirmation;
 
 Confirmation.propTypes = {
     order: PropTypes.object,
-    onBackToHome: () => {},
+    onBackToHome: PropTypes.func,
 };
