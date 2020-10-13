@@ -24,7 +24,7 @@ class App extends Component {
       products: [],
       cart: {},
       isCartVisible: false,
-      order: {},
+      order: this.loadOrderFromLocalStorage() ?? {},
     }
 
     this.handleAddToCart = this.handleAddToCart.bind(this);
@@ -40,9 +40,16 @@ class App extends Component {
     this.fetchMerchantDetails();
     this.fetchProducts();
     this.fetchCart();
-    if(window.localStorage.getItem('order_receipt') !== null) {
-      console.log('order receipt saved');
-      this.setState({ order:  JSON.parse(window.localStorage.getItem('order_receipt')) });
+    this.loadOrderFromLocalStorage();
+  }
+
+    /**
+     * Fetch a saved order receipt from local storage so we can show the confirmation page
+     * again between page refreshes.
+     */
+  loadOrderFromLocalStorage() {
+    if (window.localStorage.getItem('order_receipt')) {
+      return JSON.parse(window.localStorage.getItem('order_receipt'));
     }
   }
 
@@ -51,10 +58,10 @@ class App extends Component {
    */
   toggleCart() {
     const { isCartVisible } = this.state;
-    this.setState({ 
+    this.setState({
       isCartVisible: !isCartVisible,
     });
-  };
+  }
 
   /**
    * Fetch merchant details
@@ -162,12 +169,12 @@ class App extends Component {
       this.setState({
         order: order,
       });
-      // Clears the cart
-      this.refreshCart();
       // Store the order in session storage so we can show it again
       // if the user refreshes the page!
-      window.localStorage.setItem('order_receipt', JSON.stringify(this.state.order));
-      // Send the user to the receipt 
+      window.localStorage.setItem('order_receipt', JSON.stringify(order));
+      // Clears the cart
+      this.refreshCart();
+      // Send the user to the receipt
       this.props.history.push('/confirmation');
     }).catch((error) => {
         console.log('There was an error confirming your order', error);
@@ -180,7 +187,7 @@ class App extends Component {
    */
   refreshCart() {
     commerce.cart.refresh().then((newCart) => {
-      this.setState({ 
+      this.setState({
         cart: newCart,
       })
     }).catch((error) => {
@@ -210,7 +217,7 @@ class App extends Component {
   }
 
   render() {
-    const { 
+    const {
       products,
       merchant,
       cart,
@@ -239,7 +246,7 @@ class App extends Component {
                       onRemoveFromCart={this.handleRemoveFromCart}
                       onEmptyCart={this.handleEmptyCart}
                     />
-                  } 
+                  }
                   <ProductsList
                     {...props}
                     products={products}
@@ -266,13 +273,14 @@ class App extends Component {
             path="/confirmation"
             exact
             render={(props) => {
-              if (!this.state.order) {
+              if (!order) {
                 return props.history.push('/');
-              };
+              }
               return (
                 <Confirmation
                   {...props}
                   order={order}
+                  onBackToHome={() => window.localStorage.removeItem('order_receipt')}
                 />
               )
             }}
