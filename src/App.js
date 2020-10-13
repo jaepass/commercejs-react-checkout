@@ -40,9 +40,16 @@ class App extends Component {
     this.fetchMerchantDetails();
     this.fetchProducts();
     this.fetchCart();
-    if(window.localStorage.getItem('order_receipt') !== null) {
+    this.loadOrderFromLocalStorage();
+  }
+
+  loadOrderFromLocalStorage() {
+    if(window.localStorage.getItem('order_receipt')) {
+      const persistedOrder = JSON.parse(window.localStorage.getItem('order_receipt'));
       console.log('order receipt saved');
-      this.setState({ order:  JSON.parse(window.localStorage.getItem('order_receipt')) });
+      this.setState({ 
+        order: persistedOrder,
+      });
     }
   }
 
@@ -162,11 +169,11 @@ class App extends Component {
       this.setState({
         order: order,
       });
-      // Clears the cart
-      this.refreshCart();
       // Store the order in session storage so we can show it again
       // if the user refreshes the page!
-      window.localStorage.setItem('order_receipt', JSON.stringify(this.state.order));
+      window.localStorage.setItem('order_receipt', JSON.stringify(order));
+      // Clears the cart
+      this.refreshCart();
       // Send the user to the receipt 
       this.props.history.push('/confirmation');
     }).catch((error) => {
