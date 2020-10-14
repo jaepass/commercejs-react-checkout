@@ -19,7 +19,7 @@ class Cart extends Component {
         if (cart.total_unique_items > 0) {
           return;
         }
-    
+
         return (
           <p className="cart__none">
             You have no items in your shopping cart, start adding some!
@@ -32,7 +32,7 @@ class Cart extends Component {
         if (cart.total_unique_items === 0) {
           return;
         }
-    
+
         return (
           <>
             {cart.line_items.map(lineItem => (
@@ -54,7 +54,7 @@ class Cart extends Component {
                 to="/checkout"
               >
                 Checkout
-              </Link> 
+              </Link>
             </div>
           </>
         );
