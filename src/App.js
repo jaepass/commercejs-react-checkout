@@ -43,10 +43,10 @@ class App extends Component {
     this.loadOrderFromLocalStorage();
   }
 
-    /**
-     * Fetch a saved order receipt from local storage so we can show the confirmation page
-     * again between page refreshes.
-     */
+  /**
+   * Fetch a saved order receipt from local storage so we can show the confirmation page
+   * again between page refreshes.
+   */
   loadOrderFromLocalStorage() {
     if (window.localStorage.getItem('order_receipt')) {
       return JSON.parse(window.localStorage.getItem('order_receipt'));
@@ -119,10 +119,10 @@ class App extends Component {
    * https://commercejs.com/docs/sdk/cart/#update-cart
    *
    * @param {string} lineItemId ID of the cart line item being updated
-   * @param {number} newQuantity New line item quantity to update
+   * @param {number} quantity New line item quantity to update
    */
-  handleUpdateCartQty(lineItemId, newQuantity) {
-    commerce.cart.update(lineItemId, { newQuantity }).then((resp) => {
+  handleUpdateCartQty(lineItemId, quantity) {
+    commerce.cart.update(lineItemId, { quantity }).then((resp) => {
       this.setState({ cart: resp.cart })
     }).catch((error) => {
       console.log('There was an error updating the cart items', error);
