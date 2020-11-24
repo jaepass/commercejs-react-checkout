@@ -11,7 +11,6 @@ class CartItem extends Component {
   }
 
   handleUpdateCartQty(lineItemId, quantity) {
-    console.log('child');
     this.props.onUpdateCartQty(lineItemId, quantity);
   }
 

@@ -20,33 +20,33 @@
 
         &__image {
             border: 2px solid $text-primary;
-            width: 90%;
+            width: 100%;
         }
-    
+
         &__name {
             color: $text-primary;
             padding-top: 1rem;
             padding-bottom: 0.25rem;
         }
-    
+
         &__details {
             display: flex;
             justify-content: space-between;
             margin-top: 0.75rem;
         }
-    
+
         &__price {
             align-self: center;
             margin: 0;
             color: $text-grey;
         }
-    
-    
+
+
         &__details {
             display: flex;
             justify-content: space-between;
         }
-    
+
         &__btn {
             background: $color-accent;
             color: white;
@@ -56,7 +56,7 @@
             transition: all 0.3s ease-in-out;
             margin-top: 1rem;
             border: none;
-    
+
             &:hover {
                 background-color: lighten(#EF4E42, 5);
             }

@@ -1085,13 +1085,13 @@ handleCaptureCheckout(checkoutTokenId, newOrder) {
     this.setState({
       order,
     });
-    // Store the order in session storage so we can show it again if the
-    // user refreshes the page!
-    window.sessionStorage.setItem('order_receipt', JSON.stringify(order));   
     // Clear the cart
     this.refreshCart();
     // Send the user to the receipt 
     this.props.history.push('/confirmation');
+    // Store the order in session storage so we can show it again if the
+    // user refreshes the page!
+    window.sessionStorage.setItem('order_receipt', JSON.stringify(order));   
   }).catch((error) => {
     console.log('There was an error confirming your order', error);
   });

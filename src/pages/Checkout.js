@@ -34,16 +34,17 @@ class Checkout extends Component {
 
         this.handleFormChanges = this.handleFormChanges.bind(this);
         this.handleShippingCountryChange = this.handleShippingCountryChange.bind(this);
+        this.handleSubdivisionChange = this.handleSubdivisionChange.bind(this);
         this.handleCaptureCheckout = this.handleCaptureCheckout.bind(this);
     };
 
     componentDidMount() {
-        this.generateCheckoutToken().then(() => this.fetchSubdivisions(this.state.shippingCountry));
+      this.generateCheckoutToken();
     };
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.shippingCountry !== prevState.shippingCountry) {
-            this.fetchShippingOptions(this.state);
+          this.fetchShippingOptions(this.state.checkoutToken.id, this.state.shippingCountry);
         }
     };
 
@@ -57,7 +58,6 @@ class Checkout extends Component {
             return commerce.checkout.generateToken(cart.id, { type: 'cart' })
                 .then((token) => this.setState({ checkoutToken: token }))
                 .then(() => this.fetchShippingCountries(this.state.checkoutToken.id))
-                .then(() => this.fetchShippingOptions(this.state.checkoutToken.id, this.state.shippingCountry, this.state.shippingStateProvince))
                 .catch((error) => {
                     console.log('There was an error in generating a token', error);
                 });
@@ -72,7 +72,7 @@ class Checkout extends Component {
      */
     fetchShippingCountries(checkoutTokenId) {
         commerce.services.localeListShippingCountries(checkoutTokenId).then((countries) => {
-            this.setState({ 
+            this.setState({
                 shippingCountries: countries.countries,
             })
         }).catch((error) => {
@@ -88,7 +88,7 @@ class Checkout extends Component {
      */
     fetchSubdivisions(countryCode) {
         commerce.services.localeListSubdivisions(countryCode).then((subdivisions) => {
-            this.setState({ 
+            this.setState({
                 shippingSubdivisions: subdivisions.subdivisions,
             })
         }).catch((error) => {
@@ -106,7 +106,7 @@ class Checkout extends Component {
      */
     fetchShippingOptions(checkoutTokenId, country, stateProvince = null) {
         commerce.checkout.getShippingOptions(checkoutTokenId,
-            { 
+            {
                 country: country,
                 region: stateProvince
             }).then((options) => {
@@ -122,15 +122,20 @@ class Checkout extends Component {
     };
 
     handleFormChanges(e) {
-        this.setState({
-            [e.target.name]: e.target.value,
-        });
+      this.setState({
+        [e.target.name]: e.target.value,
+      });
     };
 
     handleShippingCountryChange(e) {
-        const currentValue = e.target.value;
-        this.fetchSubdivisions(currentValue);
+      const currentValue = e.target.value;
+      this.fetchSubdivisions(currentValue);
     };
+
+    handleSubdivisionChange(e) {
+      const currentValue = e.target.value;
+      this.fetchShippingOptions(this.state.checkoutToken.id, this.state.shippingCountry, currentValue)
+    }
 
     handleCaptureCheckout(e) {
         e.preventDefault();
@@ -215,10 +220,10 @@ class Checkout extends Component {
                 </select>
 
                 <label className="checkout__label" htmlFor="shippingStateProvince">State/province</label>
-                <select 
+                <select
                     value={this.state.shippingStateProvince}
                     name="shippingStateProvince"
-                    onChange={this.handleFormChanges}
+                    onChange={this.handleSubdivisionChange}
                     className="checkout__select"
                 >
                     <option className="checkout__option" disabled>State/province</option>
@@ -229,7 +234,7 @@ class Checkout extends Component {
                             );
                         })
                     };
-                    
+
                 </select>
 
                 <label className="checkout__label" htmlFor="shippingOption">Shipping method</label>
