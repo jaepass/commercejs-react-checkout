@@ -15,16 +15,16 @@ class Checkout extends Component {
             // Shipping details
             shippingName: 'Jane Doe',
             shippingStreet: '123 Fake St',
-            shippingCity: 'San Francisco',
-            shippingStateProvince: 'CA',
-            shippingPostalZipCode: '94107',
-            shippingCountry: 'US',
+            shippingCity: '',
+            shippingStateProvince: '',
+            shippingPostalZipCode: '',
+            shippingCountry: '',
             // Payment details
             cardNum: '4242 4242 4242 4242',
             expMonth: '11',
             expYear: '2023',
             ccv: '123',
-            billingPostalZipcode: '94107',
+            billingPostalZipcode: '',
             // Shipping and fulfillment data
             shippingCountries: {},
             shippingSubdivisions: {},
