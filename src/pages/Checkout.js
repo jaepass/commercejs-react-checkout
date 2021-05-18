@@ -48,6 +48,23 @@ class Checkout extends Component {
         }
     };
 
+    sanitizedLineItems(lineItems) {
+      return lineItems.reduce((data, lineItem) => {
+        const item = data;
+        let variantData = null;
+        if (lineItem.selected_options.length) {
+          variantData = {
+            [lineItem.selected_options[0].group_id]: lineItem.selected_options[0].option_id,
+          };
+        }
+        item[lineItem.id] = {
+          quantity: lineItem.quantity,
+          variants: variantData,
+        };
+        return item;
+      }, {});
+    }
+
    /**
     *  Generates a checkout token
     *  https://commercejs.com/docs/sdk/checkout#generate-token
@@ -138,9 +155,10 @@ class Checkout extends Component {
     }
 
     handleCaptureCheckout(e) {
+        const { cart } = this.props;
         e.preventDefault();
         const orderData = {
-            line_items: this.state.checkoutToken.live.line_items,
+            line_items: this.sanitizedLineItems(cart.line_items),
             customer: {
                 firstname: this.state.firstName,
                 lastname: this.state.lastName,
@@ -164,7 +182,7 @@ class Checkout extends Component {
                     expiry_month: this.state.expMonth,
                     expiry_year: this.state.expYear,
                     cvc: this.state.ccv,
-                    postal_zip_code: this.state.billingPostalZipcode
+                    postal_zip_code: this.state.shippingPostalZipCode
                 }
             }
         };
